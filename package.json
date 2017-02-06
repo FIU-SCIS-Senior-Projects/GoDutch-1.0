@@ -1,0 +1,39 @@
+{
+  "name": "godutch",
+  "version": "1.0.0",
+  "description": "Senior Project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zhenglin-pan/GoDutch.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/zhenglin-pan/GoDutch/issues"
+  },
+  "homepage": "https://github.com/zhenglin-pan/GoDutch#readme",
+  "dependencies": {
+    "jquery": "^2.2.0"
+  },
+  "devDependencies": {
+    "browser-sync": "^2.18.7",
+    "browserify": "^13.3.0",
+    "del": "^2.2.2",
+    "eslint": "^2.13.1",
+    "express": "^4.14.1",
+    "gulp": "^3.9.1",
+    "gulp-eslint": "^2.1.0",
+    "gulp-less": "^3.3.0",
+    "gulp-run-sequence": "^0.3.2",
+    "gulp-shell": "^0.5.2",
+    "jquery": "^2.2.4",
+    "partialify": "^3.1.6",
+    "vinyl-buffer": "^1.0.0",
+    "vinyl-paths": "^2.1.0",
+    "vinyl-source-stream": "^1.1.0"
+  }
+}
