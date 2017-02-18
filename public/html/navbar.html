@@ -1,0 +1,27 @@
+<ul>
+	<li><a href="#home" ng-class="{'active':selectedTab==='home'}" ng-click="selectedTab='home'">Home</a></li>
+	<li><a href="#mytrip" ng-class="{'active':selectedTab==='mytrip'}" ng-click="selectedTab='mytrip'">My Trip</a></li>
+	<li><a href="#contact" ng-class="{'active':selectedTab==='contact'}" ng-click="selectedTab='contact'">Contact Us</a></li>
+	<li><a href="#about" ng-class="{'active':selectedTab==='about'}" ng-click="selectedTab='about'">About</a></li>
+	<li class="identity">
+		<form action="/signin" ng-submit="addUser(newLogin.username, newLogin.password)" method="post">
+            <div class="item">
+                <label for="inputEmail3">Email/Username</label>
+                <div>
+                    <input type="email" name="username" id="inputEmail" placeholder="Email/Username" ng-model="newLogin.username">
+                </div>
+            </div>
+            <div class="item">
+                <label for="inputPassword3">Password</label>
+                <div>
+                    <input type="password" name="password" id="inputPassword" placeholder="Password" ng-model="newLogin.password">
+                </div>
+            </div>
+            <div class="item">
+                <div>
+                    <button type="submit" ng-disabled="isEmpty(newLogin.username) || isEmpty(newLogin.password)">Sign in</button>
+                </div>
+            </div>
+        </form>				
+	</li>
+</ul>

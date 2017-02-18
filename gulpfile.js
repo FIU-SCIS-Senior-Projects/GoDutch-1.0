@@ -17,7 +17,7 @@ var gulp = require('gulp'),
     concat = require('gulp-concat'),
     uglify = require('gulp-uglify');
 
-gulp.task('dist', ['less', 'js', 'copy:dependencies'], function() {
+gulp.task('dist', ['less', 'js', 'html', 'copy:dependencies'], function() {
     return gulp.src('public/index.html')
         .pipe(gulp.dest(path.join(__dirname, dist)));
 });
@@ -28,6 +28,11 @@ gulp.task('less', function () {
       paths: [ path.join(__dirname, 'public', 'less', 'includes') ]
     }))
     .pipe(gulp.dest('./dist/public/css'));
+});
+
+gulp.task('html', function () {
+  return gulp.src('./public/html/*.html')
+    .pipe(gulp.dest('./dist/public/html'));
 });
 
 gulp.task('js', function() {
