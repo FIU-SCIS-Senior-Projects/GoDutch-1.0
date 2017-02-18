@@ -1,3 +1,6 @@
 'use strict';
 
-angular.module('indexApp', []);
+var app = angular.module('indexApp', []);
+app.service('navigation', function () {
+    return {};
+})

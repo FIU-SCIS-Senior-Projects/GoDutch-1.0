@@ -8,6 +8,6 @@
 	<body ng-app="indexApp" >
 		<div ng-controller="navbarCtrl" class="navbar" ng-include src="template.url"></div>
 		<div ng-controller="signupCtrl" ng-show="signupVisible" ng-include src="template.url"></div>
-	    <div ng-controller="mytripCtrl" ng-include src="template.url"></div>
+	    <div ng-controller="mytripCtrl" ng-show="mytripVisible" ng-include src="template.url"></div>
 	</body>
 </html>
