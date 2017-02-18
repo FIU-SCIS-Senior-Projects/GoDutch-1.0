@@ -21,6 +21,8 @@ fs.readdirSync(modelsPath).forEach(function(file) {
 	}
 });
 
+app.use(express.static(__dirname + '/../dist/public'));
+
 var server = http.createServer(app)
 
 server.listen(app.get('port'), function (){

@@ -3,7 +3,7 @@ var control = require('../controllers/user');
 
 module.exports = function (app) {
 	app.route('/')
-		.get(control.login);
+		.get(control.homepage);
 	
 	app.post('/', function(req,res){
 		console.log(req.user);

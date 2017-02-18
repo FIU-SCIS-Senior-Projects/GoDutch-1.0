@@ -1,0 +1,26 @@
+.navbar {
+    background-color: @main-green;
+    margin: 0;
+    padding: 0;
+    font-size: @font-large;
+    font-weight: bold;
+
+	.active {
+	    background-color: @main-orange;
+	}
+
+	li a:hover:not(.active) {
+	    background-color: @light-green;
+	}
+
+	.identity {
+		font-weight: normal;
+		font-size: @font-mid;
+		float: right;
+		color: white;
+
+		.item {
+			float: left;
+		}
+	}
+}

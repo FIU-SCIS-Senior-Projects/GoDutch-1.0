@@ -1,5 +1,6 @@
 var mongoose = require('mongoose');
 var user = mongoose.model('user');
+var path = require("path");
 
 var getErrorMessage = function (err) {
 	var message = '';
@@ -32,6 +33,10 @@ exports.success = function (req, res) {
 		title: 'Successful Login!',		       
 	   	messages: "Please exit this menu."			   
    	});
+};
+
+exports.homepage = function (req, res) {
+	res.sendFile(path.resolve(__dirname + '/../../dist/public/index.html'));
 };
 
 exports.script = function (req, res) {
