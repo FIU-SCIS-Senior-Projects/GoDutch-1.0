@@ -78,5 +78,5 @@ gulp.task('dev', function(callback) {
 });
 
 gulp.task('quick', function(callback) {
-   runSequence('clean', 'dist', 'img', 'browser-sync', callback); 
+   runSequence('clean', 'dist', 'img', 'browser-sync', callback);
 });
