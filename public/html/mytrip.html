@@ -1,3 +1,29 @@
-<div>
-	<h1>test</h1>
+<div class='tripList'>
+	<h1>Trip List</h1>
+	<div ng-repeat="trip in trips" class="tripListElement">
+		<img src="trip.png" class="avatar">
+	</div>
+	<button ng-click="addTrip()">Add Trip</button>
+</div>
+<div class='tripDetailContainer'>
+	<div class='tripDetailSubcontainer'>
+		<h1>Purchasers</h1>
+		<p>{{purchasers}}</p>
+		<div ng-repeat="purchaser in purchasers" class="tripDetailElement">
+			<img src="user.png" class="avatar">
+			<p>{{purchaser}}</p>
+		</div>
+	</div>
+	<div class='tripDetailSubcontainer'>
+		<h1>Items</h1>
+		{{items}}
+	</div>
+	<div class='tripDetailSubcontainer'>
+		<h1>Consumers</h1>
+		<p>{{consumers}}</p>
+		<div ng-repeat="consumer in consumers" class="tripDetailElement">
+			<img src="user.png" class="avatar">
+			<p>{{consumer}}</p>
+		</div>
+	</div>
 </div>

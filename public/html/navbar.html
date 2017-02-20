@@ -1,8 +1,8 @@
 <ul>
-	<li><a href="#home" ng-class="{'active':selectedTab==='home'}" ng-click="selectedTab='home'">Home</a></li>
-	<li><a href="#mytrip" ng-class="{'active':selectedTab==='mytrip'}" ng-click="selectedTab='mytrip'">My Trip</a></li>
-	<li><a href="#contact" ng-class="{'active':selectedTab==='contact'}" ng-click="selectedTab='contact'">Contact Us</a></li>
-	<li><a href="#about" ng-class="{'active':selectedTab==='about'}" ng-click="selectedTab='about'">About</a></li>
+	<li><a href="#home" ng-class="{'active':varify('home')}" ng-click="set('home')">Home</a></li>
+	<li><a href="#mytrip" ng-class="{'active':varify('mytrip')}" ng-click="set('mytrip')">My Trip</a></li>
+	<li><a href="#contact" ng-class="{'active':varify('contact')}" ng-click="set('contact')">Contact Us</a></li>
+	<li><a href="#about" ng-class="{'active':varify('about')}" ng-click="set('about')">About</a></li>
 	<li class="identity">
 		<form>
             <div class="item">
