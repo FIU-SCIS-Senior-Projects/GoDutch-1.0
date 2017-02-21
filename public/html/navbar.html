@@ -4,7 +4,7 @@
 	<li><a href="#contact" ng-class="{'active':selectedTab==='contact'}" ng-click="selectedTab='contact'">Contact Us</a></li>
 	<li><a href="#about" ng-class="{'active':selectedTab==='about'}" ng-click="selectedTab='about'">About</a></li>
 	<li class="identity">
-		<form action="/signin" ng-submit="addUser(newLogin.username, newLogin.password)" method="post">
+		<form>
             <div class="item">
                 <label for="inputEmail3">Email/Username</label>
                 <div>
@@ -19,9 +19,12 @@
             </div>
             <div class="item">
                 <div>
-                    <button type="submit" ng-disabled="isEmpty(newLogin.username) || isEmpty(newLogin.password)">Sign in</button>
+                    <button ng-click="signin()" ng-disabled="isEmpty(newLogin.username) || isEmpty(newLogin.password)">Sign in</button>
                 </div>
             </div>
-        </form>				
+		 </form>
+		<div class="item">
+				<button ng-click="signup()">Sign Up</button>
+		</div> 
 	</li>
 </ul>

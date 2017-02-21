@@ -1,20 +1,20 @@
-<form class="signup" action="/signup" method="post">
+<form class="signup col-lg-1">
 	<div>
 	    <label for="inputEmail3" class="col-sm-2 control-label">Email</label>
 	    <div class="col-sm-10">
-	        <input type="email" class="form-control loginform" name="email" id="inputEmail" placeholder="Email">
+	        <input type="email" class="form-control loginform" name="email" id="inputEmail" placeholder="Email" ng-model="User.email">
 	    </div>
 	</div>
 	<div>
 	    <label for="inputEmail3" class="col-sm-2 control-label">Username</label>
 	    <div class="col-sm-10">
-	        <input type="text" class="form-control loginform" name="username" id="inputUsername" placeholder="Username">
+	        <input type="text" class="form-control loginform" name="username" id="inputUsername" placeholder="Username" ng-model="User.username">
 	    </div>
 	</div>
 	<div>
 	    <label for="inputEmail3" class="col-sm-2 control-label">Password</label>
 	    <div class="col-sm-10">
-	        <input type="password" class="form-control loginform" name="useles" id="inputPassword" placeholder="Please enter desired password">
+	        <input type="password" class="form-control loginform" name="useles" id="inputPassword" placeholder="Please enter desired password" ng-model="User.password">
 	    </div>
 	</div>
 
@@ -22,13 +22,13 @@
 	    <label for="inputPassword3" class="col-sm-2 control-label">Re-Password</label>
 	    <div class="col-sm-10">
 	        <input type="password" class="form-control loginform" name="password" id="inputRePassword"
-	               placeholder="Please re-enter Password">
+	               placeholder="Please re-enter Password" ng-model="User.repassword">
 	    </div>
 	</div>
 
 	<div>
 	    <div class="col-sm-offset-2 col-sm-10">
-	        <button type="submit" class="btn btn-default">Sign up</button>
+	        <button class="btn btn-default btn-lg" ng-click="register()">Sign up</button>
 	    </div>
 	</div>
 </form>

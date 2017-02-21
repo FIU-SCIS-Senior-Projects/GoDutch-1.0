@@ -29,10 +29,7 @@ var getErrorMessage = function (err) {
 };
 
 exports.success = function (req, res) {
-	res.render('success', {	
-		title: 'Successful Login!',		       
-	   	messages: "Please exit this menu."			   
-   	});
+	res.send('successful login');
 };
 
 exports.homepage = function (req, res) {
@@ -45,15 +42,9 @@ exports.script = function (req, res) {
 
 exports.login = function (req, res) {
 	if (!req.user) {
-		res.render('login', {	
-			title: 'Sign-in Form',					     
-	 		messages: req.flash('error') || req.flash('info')					       
-	   	});				    
+		res.send('you need to login');				    
 	} else {		
-		res.render('success', {			
-			title: 'Your already signed in!',							
-			messages: 'Welcome ' + req.user									     
-	 	});								    
+		res.render('you are already signed in');								    
 	}
 };
 
@@ -75,30 +66,20 @@ exports.signuppage = function(req, res, rext){
 exports.signup = function (req, res, next) {
 	if (req.user) { //If the user is already signed in
 	   	console.log('c');
-	   	res.render('success', {						           
-		   	title: 'You already registered silly!',	
-			messages: "GTFO"			
-		});							
-	} else {			
+	   	res.send('success');						
+	} else {		
 		var User = new user(req.body);
-		console.log(req.body);		
-		console.log(User);									
+		console.log(User)		
 		User.provider = 'local';
 		User.save(function (err) {
 			if (err) { //If the creation of the new user didn't work
-				res.render('signup', {
-					title: 'Sign-up Form',				
-					message: getErrorMessage(err) + ' ERR in save'	
-				});	
+				res.send(err)
 			}
 		   	else {
 				req.login(User, function (err) {
 					if (err) return next(err);
 					else {
-						res.render('success', {				
-							title: 'Successful Registration!',
-							messages: "You are logged in. Please exit this menu."
-						});						
+						res.send('success');		
 					}						
 				});					
 			}				

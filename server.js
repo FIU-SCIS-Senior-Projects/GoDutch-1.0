@@ -4,24 +4,24 @@ var fs = require('fs');
 var mongoose = require('mongoose')
 var root = __dirname;
 
-var config = require('./config/config');
-require('./config/db')(config);
+var config = require('./server/config/config');
+require('./server/config/db')(config);
 
 var passport = require('passport');
-require('./config/passport')(passport);
+require('./server/config/passport')(passport);
 
 var express = require('express');
 var app = express();
-require('./config/index')(app);
+require('./server/config/index')(app);
 
-var modelsPath = root + '/models';
+var modelsPath = root + '/server/models';
 fs.readdirSync(modelsPath).forEach(function(file) {
 	if (file.indexOf('.js') >= 0){
 		require(modelsPath + '/'+ file);
 	}
 });
 
-app.use(express.static(__dirname + '/../dist/public'));
+app.use(express.static(__dirname + '/dist/public'));
 
 var server = http.createServer(app)
 

@@ -18,8 +18,9 @@ module.exports = function(app){
 		secret: config.sessionSecret
 	}));
 	
-	app.set('view engine', 'ejs');
-	app.set('views', __dirname + '/../../app');
+//	app.set('view engine', 'ejs');
+	app.set('views', __dirname + '/../../dist/public');
+	console.log(__dirname)
 	app.use(passport.initialize());
 	app.use(passport.session());
 	app.use(flash());
