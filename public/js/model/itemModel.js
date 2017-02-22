@@ -1,7 +1,7 @@
 'use strict';
 
-function itemModel(purchasers=null, consumers=null) {
-	this.name = "";
-	this.purchasers = [];
-	this.consumers = [];
+function itemModel(name, purchasers, consumers) {
+	this.name = name;
+	this.purchasers = purchasers;
+	this.consumers = consumers;
 }

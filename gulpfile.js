@@ -47,7 +47,12 @@ gulp.task('js', function() {
     .pipe(gulp.dest('./dist/public/js'));
 });
 
-gulp.task('copy:dependencies', ['copy:js-dependencies']);
+gulp.task('copy:dependencies', ['copy:css-dependencies', 'copy:js-dependencies']);
+
+gulp.task('copy:css-dependencies', function() {
+    return gulp.src(['node_modules/bootstrap/dist/css/bootstrap.css'])
+        .pipe(gulp.dest(path.join(__dirname, dist, 'css')));
+});
 
 gulp.task('copy:js-dependencies', function() {
     return gulp.src(['node_modules/angular/angular.min.js'])

@@ -9,19 +9,19 @@ angular.module('indexApp').controller('mytripCtrl', ['$scope', function($scope){
 
 	$scope.trips = [];
 	$scope.purchasers = [];
-	$scope.item = [];
+	$scope.items = [];
 	$scope.consumers = [];
-		$scope.trips.push(new tripModel());
-		$scope.trips.push(new tripModel());
+	$scope.trips.push(new tripModel());
+	$scope.trips.push(new tripModel());
 
 	$scope.addTrip = function() {
-		var trip = new tripModel();
+		var trip = new tripModel("", "", [], [], []);
 		trip.name = "trip1";
 		trip.id = "1234567";
-		for (var i = 0; i < 10; i++) {
+		for (var i = 0; i < 15; i++) {
 			var name = "item"+i;
 			var purchasers = [i%5];
-			var consumers = [(i+1)%10, (i+2)%10, (i+3)%10];
+			var consumers = [(i+1)%15, (i+2)%15, (i+3)%15];
 			var item = new itemModel(name, purchasers, consumers);
 			trip.items.push(item);
 			trip.consumers.push(i);
@@ -33,8 +33,9 @@ angular.module('indexApp').controller('mytripCtrl', ['$scope', function($scope){
 	$scope.viewTrip = function(trip) {
 		$scope.purchasers = trip.purchasers;
 		$scope.items = [];
-		for (var i = 0; i < trip.items.length; i++)
+		for (var i = 0; i < trip.items.length; i++) {
 			$scope.items.push(trip.items[i].name);
+		}
 		$scope.consumers = trip.consumers;
 	}
 

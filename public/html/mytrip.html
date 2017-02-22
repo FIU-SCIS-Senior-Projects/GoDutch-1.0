@@ -1,29 +1,34 @@
-<div class='tripList'>
-	<h1>Trip List</h1>
-	<div ng-repeat="trip in trips" class="tripListElement">
-		<img src="trip.png" class="avatar">
-	</div>
-	<button ng-click="addTrip()">Add Trip</button>
-</div>
-<div class='tripDetailContainer'>
-	<div class='tripDetailSubcontainer'>
-		<h1>Purchasers</h1>
-		<p>{{purchasers}}</p>
-		<div ng-repeat="purchaser in purchasers" class="tripDetailElement">
-			<img src="user.png" class="avatar">
-			<p>{{purchaser}}</p>
+<div class="row">
+	<div class="tripList col-2">
+		<h1>Trip List</h1>
+		<div ng-repeat="trip in trips" class="tripListElement">
+			<img src="trip.png" class="avatar">
 		</div>
+		<button ng-click="addTrip()">Add Trip</button>
 	</div>
-	<div class='tripDetailSubcontainer'>
+	<div class="tripDetailContainer col-10">
+		<h1>Purchasers</h1>
+		<div class="tripDetailSubcontainer row justify-content-center">
+			<div ng-repeat="purchaser in purchasers" class="tripDetailElement col-1">
+				<img src="user.png" class="avatar">
+				<p>{{purchaser}}</p>
+			</div>
+		</div>
+		<hr/>
 		<h1>Items</h1>
-		{{items}}
-	</div>
-	<div class='tripDetailSubcontainer'>
+		<div class="tripDetailSubcontainer row justify-content-center">
+			<div ng-repeat="item in items" class="tripDetailElement col-1">
+				<img src="item.png" class="avatar">
+				<p>{{item}}</p>
+			</div>
+		</div>
+		<hr/>
 		<h1>Consumers</h1>
-		<p>{{consumers}}</p>
-		<div ng-repeat="consumer in consumers" class="tripDetailElement">
-			<img src="user.png" class="avatar">
-			<p>{{consumer}}</p>
+		<div class="tripDetailSubcontainer row justify-content-center">
+			<div ng-repeat="consumer in consumers" class="tripDetailElement col-1">
+				<img src="user.png" class="avatar">
+				<p>{{consumer}}</p>
+			</div>
 		</div>
 	</div>
 </div>
