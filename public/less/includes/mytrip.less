@@ -3,31 +3,42 @@
 		margin: 0;
 	}
 
+	p {
+		margin: 0;
+		text-align: center;
+	}
+
 	.tripList {
 		background-color: @triplist;
+		text-align: center;
 	}
 
 	.tripListElement {
-		width: 100px;
-		height: 150px;
+		margin: 10px 0px 10px 0px;
 		.avatar {
 			width: 100%;
 		}
-	}
-
-	.tripDetailContainer {
-		
-	}
-
-	.tripDetailSubcontainer {
-		background-color: @mainpage;
-		/*overflow: hidden;*/
 	}
 
 	.tripDetailElement {
 		.avatar {
 			width: 100%;
 			border-radius: 50%;
+			border: 1px solid;
+			border-color: white;
+			box-shadow: 0 1px 1px rgba(0,0,0,0.5);
 		}
+	}
+
+	.card {
+		margin-top: 10px;
+	}
+
+	.card-header {
+		background-color: @mainpage
+	}
+
+	.fadeTransparent {
+		opacity: 0.3;
 	}
 }

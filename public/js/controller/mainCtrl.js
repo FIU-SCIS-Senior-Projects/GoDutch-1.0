@@ -1,5 +1,5 @@
 'use strict';
 
 angular.module('indexApp').controller('mainCtrl', ['$scope', function($scope){
-    $scope.isLoggedIn = false;
+    $scope.isLoggedIn = true;
 }]);

@@ -2,32 +2,44 @@
 	<div class="tripList col-2">
 		<h1>Trip List</h1>
 		<div ng-repeat="trip in trips" class="tripListElement">
-			<img src="trip.png" class="avatar">
+			<img src="trip.png" class="avatar col-12">
 		</div>
-		<button ng-click="addTrip()">Add Trip</button>
+		<span title="add trip" ng-click="addTrip()"><i class="material-icons" style="font-size:48px;">add_circle_outline</i></span>
 	</div>
-	<div class="tripDetailContainer col-10">
-		<h1>Purchasers</h1>
-		<div class="tripDetailSubcontainer row justify-content-center">
-			<div ng-repeat="purchaser in purchasers" class="tripDetailElement col-1">
-				<img src="user.png" class="avatar">
-				<p>{{purchaser}}</p>
+	<div class="col-10">
+		<div class="card">
+			<div class="card-header">
+				<h1>Purchasers</h1>
+			</div>
+			<div class="card-block row justify-content-center">
+				<div ng-repeat="purchaser in purchasers" class="tripDetailElement col-1" ng-mouseenter="enterPurchaser($index)" ng-mouseleave="leave()">
+					<img src="user.png" class="avatar" ng-class="{'fadeTransparent':!purchaser.active}">
+					<p>{{purchaser.name}}</p>
+				</div>
 			</div>
 		</div>
 		<hr/>
-		<h1>Items</h1>
-		<div class="tripDetailSubcontainer row justify-content-center">
-			<div ng-repeat="item in items" class="tripDetailElement col-1">
-				<img src="item.png" class="avatar">
-				<p>{{item}}</p>
+		<div class="card">
+			<div class="card-header">
+				<h1 class="row">Items</h1>
+			</div>
+			<div class="card-block row justify-content-center">
+				<div ng-repeat="item in items" class="tripDetailElement col-1" ng-mouseenter="enterItem($index)" ng-mouseleave="leave()">
+					<img src="item.png" class="avatar" ng-class="{'fadeTransparent':!item.active}">
+					<p>{{item.name}}</p>
+				</div>
 			</div>
 		</div>
 		<hr/>
-		<h1>Consumers</h1>
-		<div class="tripDetailSubcontainer row justify-content-center">
-			<div ng-repeat="consumer in consumers" class="tripDetailElement col-1">
-				<img src="user.png" class="avatar">
-				<p>{{consumer}}</p>
+		<div class="card">
+			<div class="card-header">
+				<h1 class="row">Consumers</h1>
+			</div>
+			<div class="card-block row justify-content-center">
+				<div ng-repeat="consumer in consumers" class="tripDetailElement col-1" ng-mouseenter="enterConsumer($index)" ng-mouseleave="leave()">
+					<img src="user.png" class="avatar" ng-class="{'fadeTransparent':!consumer.active}">
+					<p>{{consumer.name}}</p>
+				</div>
 			</div>
 		</div>
 	</div>
