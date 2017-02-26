@@ -2,24 +2,26 @@
 
 app.factory('socket', function () {  
 	var socket = io.connect();    
-	return {    
+	return {
 		on: function (eventName, callback) {
-			socket.on(eventName, function () {  
-				var args = arguments;
-				/*$rootScope.$apply(function () {
-					callback.apply(socket, args);
-				});*/
-			});
+			socket.on(eventName, callback);
+			// socket.on(eventName, function () {  
+			// 	var args = arguments;
+			// 	/*$rootScope.$apply(function () {
+			// 		callback.apply(socket, args);
+			// 	});*/
+			// });
 		},
-	emit: function (eventName, data, callback) {
-  		socket.emit(eventName, data, function () {
-			var args = arguments;
-			/*$rootScope.$apply(function () {
-				if (callback) {
-					callback.apply(socket, args);
-				}
-			});*/
-		})
-	}
-  };
+		emit: function (eventName, data, callback) {
+			socket.emit(eventName, data, callback);
+			// socket.emit(eventName, data, function () {
+			// 	var args = arguments;
+			// 	/*$rootScope.$apply(function () {
+			// 		if (callback) {
+			// 			callback.apply(socket, args);
+			// 		}
+			// 	});*/
+			// })
+		}
+	};
 });

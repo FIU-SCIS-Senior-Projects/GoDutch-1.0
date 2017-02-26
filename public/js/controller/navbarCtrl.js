@@ -17,6 +17,7 @@ angular.module('indexApp').controller('navbarCtrl', ['$scope','$http','socket', 
 		$http.post('/signin', $scope.newLogin, config).
 		then (
 			function(res){//success
+				$scope.$parent.isLoggedIn = true;			
 				console.log(res);
 			},function(res){//failure
 				console.log(res);

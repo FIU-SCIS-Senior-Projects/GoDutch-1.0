@@ -1,7 +1,7 @@
 <div class="row">
 	<div class="tripList col-2">
 		<h1>Trip List</h1>
-		<div ng-repeat="trip in trips" class="tripListElement">
+		<div ng-repeat="trip in trips" class="tripListElement" ng-click="viewTrip()">
 			<img src="trip.png" class="avatar col-12">
 		</div>
 		<span title="add trip" ng-click="addTrip()"><i class="material-icons" style="font-size:48px;">add_circle_outline</i></span>

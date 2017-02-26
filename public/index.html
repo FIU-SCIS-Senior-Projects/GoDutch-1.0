@@ -13,7 +13,7 @@
 		<nav ng-controller="navbarCtrl" class="navbar" ng-include src="template.url"></nav>
 		<div class="container-fluid">
 			<div class="row">
-				<div ng-controller="signupCtrl" ng-show="!isLoggedIn" ng-include src="template.url"></div> 
+				<div ng-controller="signupCtrl" ng-show="!isLoggedIn" class="signup col-12" ng-include src="template.url"></div> 
 			    <div ng-controller="mytripCtrl" ng-show="isLoggedIn && show()" class="mytrip col-12" ng-include src="template.url"></div>
 		    </div>
 	    </div>
