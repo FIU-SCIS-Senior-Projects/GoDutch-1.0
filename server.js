@@ -24,6 +24,13 @@ fs.readdirSync(modelsPath).forEach(function(file) {
 app.use(express.static(__dirname + '/dist/public'));
 
 var server = http.createServer(app)
+var io = require('socket.io')(server);
+
+io.on('connection', function(client) {
+	client.on('test', function(data) {
+		console.log('data', data);
+	});
+});
 
 server.listen(app.get('port'), function (){
 	console.log('App started at ' + app.get('port'));
