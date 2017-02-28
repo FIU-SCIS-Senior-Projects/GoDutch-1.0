@@ -36,10 +36,6 @@ exports.homepage = function (req, res) {
 	res.sendFile(path.resolve(__dirname + '/../../dist/public/index.html'));
 };
 
-exports.script = function (req, res) {
-   	res.send(__dirname + "/../../node_modules/angular")
-};
-
 exports.login = function (req, res) {
 	if (!req.user) {
 		res.send('you need to login');				    
@@ -48,21 +44,6 @@ exports.login = function (req, res) {
 	}
 };
 
-exports.signup_render = function (req, res) {
-	res.render('signup', {	
-		title: 'Sign-up Form',	        
-		message: ""		 
-	});
-};
-
-
-
-exports.signuppage = function(req, res, rext){
-	res.render('signup', {
-		title: 'Sign-up Form',
-		message: 'WELCOME'	
-	});
-};
 exports.signup = function (req, res, next) {
 	if (req.user) { //If the user is already signed in
 	   	console.log('c');

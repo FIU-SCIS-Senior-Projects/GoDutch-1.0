@@ -27,6 +27,7 @@ var server = http.createServer(app)
 var io = require('socket.io')(server);
 
 io.on('connection', function(socket) {
+	require('./server/routes/tripRoute')(socket);
 	socket.on('test', function(data) {
 		console.log('data', data);
 	});

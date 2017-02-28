@@ -11,8 +11,6 @@ angular.module('indexApp').controller('mytripCtrl', ['$scope', 'socket', functio
 	$scope.purchasers = [];
 	$scope.items = [];
 	$scope.consumers = [];
-	$scope.trips.push(new tripModel());
-	$scope.trips.push(new tripModel());
 	var p2iMap = new Map();
 	var i2pMap = new Map();
 	var i2cMap = new Map();
@@ -78,6 +76,7 @@ angular.module('indexApp').controller('mytripCtrl', ['$scope', 'socket', functio
 			$scope.items.push(trip.items[i]);
 		}
 		$scope.consumers = trip.consumers;
+		$scope.trips.push(trip);
 	}
 
 	var hideAll = function() {
@@ -135,7 +134,9 @@ angular.module('indexApp').controller('mytripCtrl', ['$scope', 'socket', functio
 	}
 
 	$scope.saveTrip = function() {
-		
+		console.log($scope.trips);
+		if ($scope.trips)
+			socket.emit('saveTrip', $scope.trips[0]);
 	}
 
 	$scope.deleteTrip = function() {
