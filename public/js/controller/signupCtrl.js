@@ -19,7 +19,8 @@ angular.module('indexApp').controller('signupCtrl', ['$scope','$http','socket', 
 			$http.post('/signup', $scope.User, config).
 			then(
 				function(response){
-					$scope.$parent.isLoggedIn = true;				
+					$scope.$parent.isLoggedIn = true;
+					$scope.$parent.visibleLogin = false;				
 					// success callback        
 					console.log(response)
 				},        

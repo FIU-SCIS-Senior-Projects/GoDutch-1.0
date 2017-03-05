@@ -4,7 +4,8 @@
         <li><a href="#mytrip" ng-class="{'active':varify('mytrip')}" ng-click="set('mytrip')">My Trip</a></li>
         <li><a href="#contact" ng-class="{'active':varify('contact')}" ng-click="set('contact')">Contact Us</a></li>
         <li><a href="#about" ng-class="{'active':varify('about')}" ng-click="set('about')">About</a></li>
-        <li class="identity">
+		<button class="identity" ng-click="signout()" ng-show="!visibleLogin">Sign Out</button>
+        <li class="identity" ng-show="visibleLogin">
             <form class="navbar-form">
                 <div class="item">
                     <label for="inputEmail3">Email/Username</label>

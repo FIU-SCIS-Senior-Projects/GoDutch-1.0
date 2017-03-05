@@ -4,6 +4,7 @@ angular.module('indexApp').controller('navbarCtrl', ['$scope','$http','socket', 
 	// selectedTab = 'mytrip';
 	$scope.template = { name: 'navbar.html', url: '/html/navbar.html'};
 	$scope.newLogin = {}
+	
 	var config = {
 		headers : {		
 			'Content-Type': 'application/json'
@@ -17,12 +18,32 @@ angular.module('indexApp').controller('navbarCtrl', ['$scope','$http','socket', 
 		$http.post('/signin', $scope.newLogin, config).
 		then (
 			function(res){//success
-				$scope.$parent.isLoggedIn = true;			
-				console.log(res);
+				if(res == 'success'){
+					$scope.$parent.isLoggedIn = true;
+					$scope.$parent.visibleLogin = false;			
+					console.log(res);
+				}
+				$scope.$parent.isLoggedIn = true;
+				$scope.$parent.visibleLogin = false;
+
 			},function(res){//failure
 				console.log(res);
 			}
 		)
+	}
+	$scope.signout = function(){
+		console.log('button pressed');
+		$http.post('/signout', '', config).
+		then(
+			function(res){
+				if(res === 'success'){
+					$scope.$parent.visibleLogin = true;
+					console.log('u logged out');
+				}
+				console.log(res);
+			},function(res){
+				console.log(res)
+		})
 	}
 
 	$scope.$parent.selectedTab = 'mytrip';
