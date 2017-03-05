@@ -10,8 +10,7 @@ module.exports = function (app) {
 		res.stats('login').send({user:req.user});
 	});
 
-	app.route('/signup')	
-		.get(control.signup_render)				    
+	app.route('/signup')				    
 		.post(control.signup);
 
 	app.route('/success')

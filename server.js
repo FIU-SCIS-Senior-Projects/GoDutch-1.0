@@ -24,6 +24,27 @@ fs.readdirSync(modelsPath).forEach(function(file) {
 app.use(express.static(__dirname + '/dist/public'));
 
 var server = http.createServer(app)
+var io = require('socket.io')(server);
+
+io.on('connection', function(socket) {
+	require('./server/routes/tripRoute')(socket);
+	socket.on('test', function(data) {
+		console.log('data', data);
+	});
+    socket.on('room', function(room) {
+		if (io.sockets.adapter.sids[socket.id][room]) {
+			console.log(room, 'in');
+			room = "random";
+			io.in(room).emit('message', {data: 'you are already in'});
+		} else {
+        	socket.join(room);
+			console.log(room, 'out');
+			room = "random";
+			io.in(room).emit('message', {data: 'join room'});
+		}
+    });
+});
+
 
 server.listen(app.get('port'), function (){
 	console.log('App started at ' + app.get('port'));

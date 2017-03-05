@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('indexApp').controller('mytripCtrl', ['$scope', function($scope){
+angular.module('indexApp').controller('mytripCtrl', ['$scope', 'socket', function($scope, socket){
 	$scope.template = { name: 'mytrip.html', url: '/html/mytrip.html'};
 
 	$scope.show = function(){
@@ -11,12 +11,14 @@ angular.module('indexApp').controller('mytripCtrl', ['$scope', function($scope){
 	$scope.purchasers = [];
 	$scope.items = [];
 	$scope.consumers = [];
-	$scope.trips.push(new tripModel());
-	$scope.trips.push(new tripModel());
 	var p2iMap = new Map();
 	var i2pMap = new Map();
 	var i2cMap = new Map();
 	var c2iMap = new Map();
+
+	socket.on('message', function(data) {
+		console.log('Incoming message:', data);
+	});
 
 	var mapPushHelper = function(map, key, value) {
 		if (!map.get(key))
@@ -26,6 +28,12 @@ angular.module('indexApp').controller('mytripCtrl', ['$scope', function($scope){
 
 	// temporarily use number to represent persons. need personModel later.
 	$scope.addTrip = function() {
+		var room = "random";
+		socket.emit('room', room);
+	}
+
+	// add parameter index to select a trip from trip list.
+	$scope.viewTrip = function() {
 		var trip = new tripModel("", "", [], [], []);
 		trip.name = "trip1";
 		trip.id = "1234567";
@@ -60,16 +68,15 @@ angular.module('indexApp').controller('mytripCtrl', ['$scope', function($scope){
 			}
 		// console.log(i2cMap);
 		}
-		$scope.viewTrip(trip);
-	}
 
-	$scope.viewTrip = function(trip) {
+		
 		$scope.purchasers = trip.purchasers;
 		$scope.items = [];
 		for (var i = 0; i < trip.items.length; i++) {
 			$scope.items.push(trip.items[i]);
 		}
 		$scope.consumers = trip.consumers;
+		$scope.trips.push(trip);
 	}
 
 	var hideAll = function() {
@@ -127,7 +134,9 @@ angular.module('indexApp').controller('mytripCtrl', ['$scope', function($scope){
 	}
 
 	$scope.saveTrip = function() {
-		
+		console.log($scope.trips);
+		if ($scope.trips)
+			socket.emit('saveTrip', $scope.trips[0]);
 	}
 
 	$scope.deleteTrip = function() {

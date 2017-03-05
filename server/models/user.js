@@ -27,35 +27,35 @@ var Schema = new mongoose.Schema({
 	 provider: {
 	 	type: String,
 		required: [true, 'Provider is required']
-	 }
-	
+	 },
+	 triplist: [{type: mongoose.Schema.Types.ObjectId, ref: 'trip'}]
 });
 
 Schema.pre('save', function (next) {
-	    if (this.password) {
-			        this.salt = new
-	            Buffer(crypto.randomBytes(16).toString('base64'), 'base64');
-        console.log('before encrypt ' + this.password + ' AFTER ' + this.hashPassword(this.password));
+	if (this.password) {
+		this.salt = new Buffer(crypto.randomBytes(16).toString('base64'), 'base64');
+		console.log('before encrypt ' + this.password + ' AFTER ' + this.hashPassword(this.password));
 		this.password = this.hashPassword(this.password);
-		    }
-		    next();
+	}
+	next();
 });
+
 Schema.methods.hashPassword = function (password) {
-	    //return crypto.pbkdf2Sync(password, this.salt, 10000,
-		//		        64).digest('hex').toString('base64');
-		var hash = crypto.createHmac('sha512', this.salt)
-		hash.update(password)
-		return hash.digest('base64')
+	//return crypto.pbkdf2Sync(password, this.salt, 10000,
+	//		        64).digest('hex').toString('base64');
+	var hash = crypto.createHmac('sha512', this.salt)
+	hash.update(password)
+	return hash.digest('base64')
 };
+
 Schema.methods.authenticate = function (password) {
-		//console.log(password + ' HASH ' + password);   
-   		return this.password === this.hashPassword(password);
+	//console.log(password + ' HASH ' + password);   
+	return this.password === this.hashPassword(password);
 };
 
 Schema.set('toJSON', {
-	    getters: true,
-	    virtuals: true
+	getters: true,
+	virtuals: true
 });
-
 
 mongoose.model('user', Schema);

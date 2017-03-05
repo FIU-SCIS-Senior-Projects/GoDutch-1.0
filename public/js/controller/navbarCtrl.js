@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('indexApp').controller('navbarCtrl', ['$scope','$http', function($scope, $http){
+angular.module('indexApp').controller('navbarCtrl', ['$scope','$http','socket', function($scope, $http, socket){
 	// selectedTab = 'mytrip';
 	$scope.template = { name: 'navbar.html', url: '/html/navbar.html'};
 	$scope.newLogin = {}
@@ -13,11 +13,13 @@ angular.module('indexApp').controller('navbarCtrl', ['$scope','$http', function(
 		return data == '' || data == undefined || data == null;
 	}
 	$scope.signin = function(){
+		socket.emit('test', 'login request');
 		$http.post('/signin', $scope.newLogin, config).
 		then (
-			function(res){
+			function(res){//success
+				$scope.$parent.isLoggedIn = true;			
 				console.log(res);
-			},function(res){
+			},function(res){//failure
 				console.log(res);
 			}
 		)

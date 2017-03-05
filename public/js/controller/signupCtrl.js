@@ -1,7 +1,8 @@
 'use strict';
 
-angular.module('indexApp').controller('signupCtrl', ['$scope','$http', function($scope, $http){
-    $scope.signupVisible = false;
+angular.module('indexApp').controller('signupCtrl', ['$scope','$http','socket', function($scope, $http, socket){
+//    $scope.signupVisible = false;
+	socket.emit('test', 'Hello World');
 	$scope.User = {};
 	$scope.template = { name: 'signup.html', url: '/html/signup.html'};
 	var config = {
@@ -17,7 +18,8 @@ angular.module('indexApp').controller('signupCtrl', ['$scope','$http', function(
 			console.log($scope.User);
 			$http.post('/signup', $scope.User, config).
 			then(
-				function(response){				
+				function(response){
+					$scope.$parent.isLoggedIn = true;				
 					// success callback        
 					console.log(response)
 				},        
