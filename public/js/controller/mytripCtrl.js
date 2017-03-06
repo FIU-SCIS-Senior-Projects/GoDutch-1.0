@@ -6,31 +6,69 @@ angular.module('indexApp').controller('mytripCtrl', ['$scope', 'socket', functio
 	$scope.show = function(){
 		return $scope.$parent.selectedTab === 'mytrip'
 	}
-
+	$scope.username = "test";
 	$scope.trips = [];
 	$scope.purchasers = [];
 	$scope.items = [];
 	$scope.consumers = [];
-	var p2iMap = new Map();
-	var i2pMap = new Map();
-	var i2cMap = new Map();
-	var c2iMap = new Map();
+
+	$scope.currentItem = {
+		name: new itemModel("New Item", [], [], []),
+		moneySpent: 0.00,
+		didConsume: true
+	};
+	$scope.currentTripIndex = -1;
+	$scope.showDetail = false;
+	var p2iMap = new Map(),
+		i2pMap = new Map(),
+		i2cMap = new Map(),
+		c2iMap = new Map();
 
 
 	var mapPushHelper = function(map, key, value) {
-		if (!map.get(key))
+		if (!map.get(key)) {
 			map.set(key, []);
+		}
 		map.get(key).push(value);
 	}
 
 	// temporarily use number to represent persons. need personModel later.
 	$scope.addTrip = function() {
+		var newTrip = new tripModel("New Trip", "", [], [], [new personModel("test")]);
+		$scope.trips.unshift(newTrip);
+		$scope.currentTripIndex = 0;
+		$scope.viewTrip(0);
 		var room = "random";
 		socket.emit('room', room);
 	}
 
 	// add parameter index to select a trip from trip list.
-	$scope.viewTrip = function() {
+	$scope.viewTrip = function(index) {
+		var curTrip = $scope.trips[index];
+		$scope.purchasers = curTrip.purchasers;
+		$scope.items = curTrip.items;
+		$scope.consumers = curTrip.consumers;
+		p2iMap = new Map();
+		i2pMap = new Map();
+		i2cMap = new Map();
+		c2iMap = new Map();
+		var i, j;
+		for (i = 0; i < $scope.items.length; i++) {
+			var curItem = $scope.items[i];
+			for (j = 0; j < curItem.purchasers.length; j++) {
+				mapPushHelper(p2iMap, curItem.purchasers[j], curItem);
+				mapPushHelper(i2pMap, curItem, {purchaser: curItem.purchasers[j],
+												payment: curItem.payments[j]});
+			}
+			for (j = 0; j < curItem.consumers.length; j++) {
+				mapPushHelper(c2iMap, curItem.consumers[j], curItem);
+				mapPushHelper(i2cMap, curItem, curItem.consumers[j]);
+			}
+		}
+	}
+
+	// for testing purpose only
+	$scope.createTest = function() {
 		var trip = new tripModel("", "", [], [], []);
 		trip.name = "trip1";
 		trip.id = "1234567";
@@ -54,16 +92,11 @@ angular.module('indexApp').controller('mytripCtrl', ['$scope', 'socket', functio
 			for (j = 0; j < purchasers.length; j++) {
 				mapPushHelper(p2iMap, purchasers[0], item);
 				mapPushHelper(i2pMap, item, purchasers[j]);
-				// $scope.p2iMap[purchasers[j]].push(i);
-				// $scope.i2pMap[i].purchasers.push(purchasers[j]);
 			}
 			for (j = 0; j < consumers.length; j++) {
 				mapPushHelper(c2iMap, consumers[j], item);
 				mapPushHelper(i2cMap, item, consumers[j]);
-			// 	// $scope.c2iMap[consumers[j]].push(i);
-			// 	// $scope.i2cMap[i].consumers.push(consumers[j]);
 			}
-		// console.log(i2cMap);
 		}
 
 		
@@ -105,7 +138,7 @@ angular.module('indexApp').controller('mytripCtrl', ['$scope', 'socket', functio
 		var cur = $scope.purchasers[index];
 		cur.active = true;
 		var list = p2iMap.get(cur);
-		for (var i = 0; i < list.length; i++) 
+		for (var i = 0; list && i < list.length; i++) 
 			list[i].active = true;
 	}
 
@@ -114,11 +147,12 @@ angular.module('indexApp').controller('mytripCtrl', ['$scope', 'socket', functio
 		var cur = $scope.items[index];
 		cur.active = true;
 		var list = i2pMap.get(cur);
-		for (var i = 0; i < list.length; i++) 
+		for (var i = 0; list && i < list.length; i++) 
+			list[i].purchaser.active = true;
+		list = i2cMap.get(cur);		
+		for (var i = 0; list && i < list.length; i++) {
 			list[i].active = true;
-		list = i2cMap.get(cur);
-		for (var i = 0; i < list.length; i++) 
-			list[i].active = true;
+		}
 	}
 
 	$scope.enterConsumer = function(index) {
@@ -126,7 +160,7 @@ angular.module('indexApp').controller('mytripCtrl', ['$scope', 'socket', functio
 		var cur = $scope.consumers[index];
 		cur.active = true;
 		var list = c2iMap.get(cur);
-		for (var i = 0; i < list.length; i++) 
+		for (var i = 0; list && i < list.length; i++) 
 			list[i].active = true;
 	}
 
@@ -138,5 +172,32 @@ angular.module('indexApp').controller('mytripCtrl', ['$scope', 'socket', functio
 
 	$scope.deleteTrip = function() {
 		
+	}
+
+	$scope.addItem = function() {
+		var item = new itemModel("New Item", [], [], $scope.consumers);
+		$scope.currentItem = {
+			name: item.name,
+			moneySpent: 0.00,
+			didConsume: true
+		};
+		$scope.trips[$scope.currentTripIndex].items.push(item);
+		$scope.showDetail = true;
+		$scope.viewTrip($scope.currentTripIndex);
+	}
+
+	$scope.editDetail = function(index) {
+		var cur = $scope.items[index];
+		var i, moneySpent = 0, didConsume = false;
+		var list = i2pMap.get(cur);
+		for (i = 0; list && i < list.length; i++)
+			if (list[i].purchaser.name === $scope.username)
+				$scope.currentItem.moneySpent = list[i].payment;
+		list = i2cMap.get(cur);
+		for (i = 0; list && i < list.length; i++)
+			if (list[i].name === $scope.username)
+				didConsume = true;
+		$scope.currentItem = $scope.items[index];
+		$scope.showDetail = true;
 	}
 }]);
