@@ -1,4 +1,6 @@
 var mongoose = require('mongoose');
+var jwt = require('jsonwebtoken');
+var config = require('./../config/config');
 var user = mongoose.model('user');
 var path = require("path");
 
@@ -7,7 +9,9 @@ var getErrorMessage = function (err) {
 		   
    	if (err.code) {	
 		switch (err.code) {				
-			case 11000:						
+			case 11000:
+				message = 'Username already exists';
+				break;				
 			case 11001:					
 				message = 'Email already exists';					
 				break;
@@ -54,13 +58,22 @@ exports.signup = function (req, res, next) {
 		User.provider = 'local';
 		User.save(function (err) {
 			if (err) { //If the creation of the new user didn't work
-				res.send(err)
+				res.status(401).json(getErrorMessage(err))
 			}
 		   	else {
 				req.login(User, function (err) {
 					if (err) return next(err);
 					else {
-						res.json(User);	
+						
+						var profile = {
+							username : User.username,
+							email : User.email,
+							id: User._id
+						}
+				
+						var token = jwt.sign(profile, config.jwtSecret, {expiresIn: config.expire});
+						res.json({token: token});
+
 					}						
 				});					
 			}				
@@ -96,17 +109,5 @@ exports.delete = function (req, res) {
 
 };
 exports.signout = function (req, res) {
-   	if (req.user) {
-	   	req.logout();
-	   	res.render('success_logout', {
-		   	title: 'Come back anytime',
-		   	messages: ''
-	   	});
-   	}
-   	else {
-	   	res.render('success_logout', {
-		   	title: 'You haven\'t logged in yet!',
-		   	messages: ''
-		});
-	}
+   	res.json({token:''});
 };

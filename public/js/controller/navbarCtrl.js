@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('indexApp').controller('navbarCtrl', ['$scope','$http','socket', function($scope, $http, socket){
+angular.module('indexApp').controller('navbarCtrl', ['$scope','$http','socket','storage', function($scope, $http, socket,storage){
 	// selectedTab = 'mytrip';
 	$scope.template = { name: 'navbar.html', url: '/html/navbar.html'};
 	$scope.newLogin = {}
@@ -18,15 +18,18 @@ angular.module('indexApp').controller('navbarCtrl', ['$scope','$http','socket', 
 		then (
 			function(res){//success
 				if(res.data.token){
-					socket.connect(res.data.token);
-					socket.on("unauthorized", function(error) {
-						if (error.data.type == "UnauthorizedError" || error.data.code == "invalid_token") {
-							console.log('token has expired');
+					socket.isConnected(res.data.token).
+					then(
+						function(success)
+						{
+							console.log(success);
+							$scope.$parent.isLoggedIn = true;
+							storage.put('token', res.data.token);
+						},function(error)
+						{
+							console.log(error);
 						}
-					});
-					socket.emit('test', 'Hello World');
-					$scope.$parent.isLoggedIn = true;
-					$scope.$parent.visibleLogin = false; 
+					);
 				}
 			},function(res){//failure
 				console.log(res.data.error);
@@ -38,11 +41,8 @@ angular.module('indexApp').controller('navbarCtrl', ['$scope','$http','socket', 
 		$http.post('/signout', '', config).
 		then(
 			function(res){
-				if(res === 'success'){
-					$scope.$parent.visibleLogin = true;
-					console.log('u logged out');
-				}
-				console.log(res);
+				$scope.$parent.isLoggedIn = false;
+				storage.put('token',res.data.token);
 			},function(res){
 				console.log(res)
 		})

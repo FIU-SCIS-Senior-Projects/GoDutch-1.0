@@ -34,6 +34,7 @@ io.use(sio.authorize({
 
 io.sockets.on('connection', function(socket) {
 	console.log(socket.decoded_token.email);
+	io.emit('success', {data: 'welcome'});
 	require('./server/routes/tripRoute')(socket);
 	socket.on('test', function(data) {
 		console.log('data', data);
