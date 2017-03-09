@@ -1,27 +1,30 @@
 'use strict';
 
-app.factory('socket', function () {  
-	var socket = io.connect();    
+app.factory('socket', function ($q) {  
+	var socket;
 	return {
 		on: function (eventName, callback) {
 			socket.on(eventName, callback);
-			// socket.on(eventName, function () {  
-			// 	var args = arguments;
-			// 	/*$rootScope.$apply(function () {
-			// 		callback.apply(socket, args);
-			// 	});*/
-			// });
 		},
 		emit: function (eventName, data, callback) {
 			socket.emit(eventName, data, callback);
-			// socket.emit(eventName, data, function () {
-			// 	var args = arguments;
-			// 	/*$rootScope.$apply(function () {
-			// 		if (callback) {
-			// 			callback.apply(socket, args);
-			// 		}
-			// 	});*/
-			// })
+		},
+		connect: function(token){
+			console.log('TOKEN ATTEMPTING TO CONNECT', token);
+			socket = io.connect('', {
+				'query' : 'token' + token
+			});			
+		},
+		isConnected: function(token){
+			var deferred = $q.defer();
+			socket = io.connect('', {
+				'query': 'token' + token
+			}).on('error', function(error){
+				deferred.reject(error);
+			}).on('success', function(msg){
+				deferred.resolve(msg);
+			});
+			return deferred.promise;
 		}
 	};
 });

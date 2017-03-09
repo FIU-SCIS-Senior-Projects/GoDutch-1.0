@@ -1,6 +1,8 @@
 var passport = require('passport'),
 	LocalStrategy = require('passport-local').Strategy,
 	User = require('mongoose').model('user');
+var jwt = require('jsonwebtoken');
+var config = require('./config.js');
 
 module.exports = function(){
 	passport.use(new LocalStrategy(function(username, password, done){

@@ -24,13 +24,24 @@ fs.readdirSync(modelsPath).forEach(function(file) {
 app.use(express.static(__dirname + '/dist/public'));
 
 var server = http.createServer(app)
+var sio = require('socketio-jwt');
 var io = require('socket.io')(server);
 
-io.on('connection', function(socket) {
+io.use(sio.authorize({
+	  secret: config.jwtSecret,
+	  handshake: true
+}));
+
+io.sockets.on('connection', function(socket) {
+	console.log(socket.decoded_token.email);
 	require('./server/routes/tripRoute')(socket);
 	socket.on('test', function(data) {
 		console.log('data', data);
 	});
+	socket.on('isLogged', function(data){
+		console.log(data);
+		io.emit('logged', {logged: true});
+	})
     socket.on('room', function(room) {
 		if (io.sockets.adapter.sids[socket.id][room]) {
 			console.log(room, 'in');
@@ -44,7 +55,6 @@ io.on('connection', function(socket) {
 		}
     });
 });
-
 
 server.listen(app.get('port'), function (){
 	console.log('App started at ' + app.get('port'));

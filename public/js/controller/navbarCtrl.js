@@ -14,20 +14,22 @@ angular.module('indexApp').controller('navbarCtrl', ['$scope','$http','socket', 
 		return data == '' || data == undefined || data == null;
 	}
 	$scope.signin = function(){
-		socket.emit('test', 'login request');
 		$http.post('/signin', $scope.newLogin, config).
 		then (
 			function(res){//success
-				if(res == 'success'){
+				if(res.data.token){
+					socket.connect(res.data.token);
+					socket.on("unauthorized", function(error) {
+						if (error.data.type == "UnauthorizedError" || error.data.code == "invalid_token") {
+							console.log('token has expired');
+						}
+					});
+					socket.emit('test', 'Hello World');
 					$scope.$parent.isLoggedIn = true;
-					$scope.$parent.visibleLogin = false;			
-					console.log(res);
+					$scope.$parent.visibleLogin = false; 
 				}
-				$scope.$parent.isLoggedIn = true;
-				$scope.$parent.visibleLogin = false;
-
 			},function(res){//failure
-				console.log(res);
+				console.log(res.data.error);
 			}
 		)
 	}

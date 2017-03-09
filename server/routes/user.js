@@ -1,6 +1,7 @@
 var passport = require('passport');
 var control = require('../controllers/user');
-
+var jwt = require('jsonwebtoken');
+var config = require('./../config/config.js');
 module.exports = function (app) {
 	app.route('/')
 		.get(control.homepage);
@@ -29,10 +30,22 @@ module.exports = function (app) {
 //		.get(control.listUsers);
 								
 	app.route('/signin')
-		.post(passport.authenticate('local', {
-			successRedirect: '/success',						
-			failureRedirect: '/login',
-			failureFlash: true			
-		}));
+		.post(function (req,res,next){
+			if(req.user){
+				res.json({message: 'already logged in'});
+			}
+			passport.authenticate('local', function(err,user,info){
+				if(err) {return next(err)}
+				if(!user) {return res.json(401,{error: 'Unsuccessful Login'})}
+				var profile = {
+					username : user.username,
+					email : user.email,
+					id: user._id
+				}
+				
+				var token = jwt.sign(profile, config.jwtSecret, {expiresIn: 60*60*5});
+				res.json({token: token});
+			})(req, res, next);
+		});
 									
 };

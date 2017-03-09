@@ -29,7 +29,7 @@ var getErrorMessage = function (err) {
 };
 
 exports.success = function (req, res) {
-	res.send('successful login');
+	res.send('successful login' + req.token);
 };
 
 exports.homepage = function (req, res) {
@@ -50,7 +50,7 @@ exports.signup = function (req, res, next) {
 	   	res.send('success');						
 	} else {		
 		var User = new user(req.body);
-		console.log(User)		
+		console.log(User);
 		User.provider = 'local';
 		User.save(function (err) {
 			if (err) { //If the creation of the new user didn't work
@@ -60,7 +60,7 @@ exports.signup = function (req, res, next) {
 				req.login(User, function (err) {
 					if (err) return next(err);
 					else {
-						res.send('success');		
+						res.json(User);	
 					}						
 				});					
 			}				
