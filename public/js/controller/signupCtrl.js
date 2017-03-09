@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('indexApp').controller('signupCtrl', ['$scope','$http','socket', function($scope, $http, socket){
+angular.module('indexApp').controller('signupCtrl', ['$scope','$http','socket','storage', function($scope, $http, socket,storage){
 //    $scope.signupVisible = false;
 	$scope.User = {};
 	$scope.template = { name: 'signup.html', url: '/html/signup.html'};
@@ -14,15 +14,12 @@ angular.module('indexApp').controller('signupCtrl', ['$scope','$http','socket', 
 			console.log('password mismatch')
 		}
 		else{
-			console.log($scope.User);
 			$http.post('/signup', $scope.User, config).
 			then(
 				function(response){
 					$scope.$parent.isLoggedIn = true;
-					$scope.$parent.visibleLogin = false;
-					socket.connect(response.token);				
-					// success callback        
-					console.log(response)
+					socket.connect(response.data.token);
+					storage.put("token", response.data.token);
 				},        
 				function(response){				
 					//                        // failure callback

@@ -16,7 +16,8 @@ module.exports = function (app) {
 
 	app.route('/success')
 		.get(control.success);
-
+	app.route('/signout')
+		.post(control.signout);
    
    	app.route('/login')
 		.get(control.login);
@@ -43,7 +44,7 @@ module.exports = function (app) {
 					id: user._id
 				}
 				
-				var token = jwt.sign(profile, config.jwtSecret, {expiresIn: 60*60*5});
+				var token = jwt.sign(profile, config.jwtSecret, {expiresIn: config.expire});
 				res.json({token: token});
 			})(req, res, next);
 		});

@@ -4,6 +4,7 @@ var config = {
 	db: 'mongodb://localhost/default',//replace default for db name
 	host: 'localhost',
 	jwtSecret: 'devSechsecret',
-	sessionSecret: 'devSech'
+	sessionSecret: 'devSech',
+	expire: 60*60*24*60
 };
 module.exports = config;
