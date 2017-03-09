@@ -1,6 +1,8 @@
 var passport = require('passport'),
 	LocalStrategy = require('passport-local').Strategy,
 	User = require('mongoose').model('user');
+var jwt = require('jsonwebtoken');
+var config = require('./config.js');
 
 module.exports = function(){
 	passport.use(new LocalStrategy(function(username, password, done){
@@ -11,13 +13,14 @@ module.exports = function(){
 		 * Afterwards it will check if the hashed stored password matches
 		 * the one which was entered
 		 */
-		var query = User.findOne({'email': username});
+		var query = User.findOne( {$or: [{'email': username}, {'username': username}]}  );
 
 		query.exec(function (err,user){
 			if (err){
 				return done(err);
 			}
 			if(!user){
+				
 				return done(null, false, {message: 'Unknown User'})
 			}
 			if(!user.authenticate(password)){//method in User model

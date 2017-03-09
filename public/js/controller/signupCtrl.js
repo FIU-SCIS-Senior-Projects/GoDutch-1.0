@@ -2,7 +2,6 @@
 
 angular.module('indexApp').controller('signupCtrl', ['$scope','$http','socket', function($scope, $http, socket){
 //    $scope.signupVisible = false;
-	socket.emit('test', 'Hello World');
 	$scope.User = {};
 	$scope.template = { name: 'signup.html', url: '/html/signup.html'};
 	var config = {
@@ -19,7 +18,9 @@ angular.module('indexApp').controller('signupCtrl', ['$scope','$http','socket', 
 			$http.post('/signup', $scope.User, config).
 			then(
 				function(response){
-					$scope.$parent.isLoggedIn = true;				
+					$scope.$parent.isLoggedIn = true;
+					$scope.$parent.visibleLogin = false;
+					socket.connect(response.token);				
 					// success callback        
 					console.log(response)
 				},        

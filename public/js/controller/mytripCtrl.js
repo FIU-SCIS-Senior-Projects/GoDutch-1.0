@@ -16,9 +16,6 @@ angular.module('indexApp').controller('mytripCtrl', ['$scope', 'socket', functio
 	var i2cMap = new Map();
 	var c2iMap = new Map();
 
-	socket.on('message', function(data) {
-		console.log('Incoming message:', data);
-	});
 
 	var mapPushHelper = function(map, key, value) {
 		if (!map.get(key))

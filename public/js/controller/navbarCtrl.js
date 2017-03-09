@@ -4,6 +4,7 @@ angular.module('indexApp').controller('navbarCtrl', ['$scope','$http','socket', 
 	// selectedTab = 'mytrip';
 	$scope.template = { name: 'navbar.html', url: '/html/navbar.html'};
 	$scope.newLogin = {}
+	
 	var config = {
 		headers : {		
 			'Content-Type': 'application/json'
@@ -13,16 +14,38 @@ angular.module('indexApp').controller('navbarCtrl', ['$scope','$http','socket', 
 		return data == '' || data == undefined || data == null;
 	}
 	$scope.signin = function(){
-		socket.emit('test', 'login request');
 		$http.post('/signin', $scope.newLogin, config).
 		then (
 			function(res){//success
-				$scope.$parent.isLoggedIn = true;			
-				console.log(res);
+				if(res.data.token){
+					socket.connect(res.data.token);
+					socket.on("unauthorized", function(error) {
+						if (error.data.type == "UnauthorizedError" || error.data.code == "invalid_token") {
+							console.log('token has expired');
+						}
+					});
+					socket.emit('test', 'Hello World');
+					$scope.$parent.isLoggedIn = true;
+					$scope.$parent.visibleLogin = false; 
+				}
 			},function(res){//failure
-				console.log(res);
+				console.log(res.data.error);
 			}
 		)
+	}
+	$scope.signout = function(){
+		console.log('button pressed');
+		$http.post('/signout', '', config).
+		then(
+			function(res){
+				if(res === 'success'){
+					$scope.$parent.visibleLogin = true;
+					console.log('u logged out');
+				}
+				console.log(res);
+			},function(res){
+				console.log(res)
+		})
 	}
 
 	$scope.$parent.selectedTab = 'mytrip';
