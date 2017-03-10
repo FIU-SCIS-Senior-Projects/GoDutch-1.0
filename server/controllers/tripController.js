@@ -1,6 +1,7 @@
 var mongoose = require('mongoose');
 var tripModel = mongoose.model('tripModel');
 var path = require("path");
+var mcmf = require("../services/mcmf");
 
 var getErrorMessage = function (err) {
 	var message = '';
@@ -37,6 +38,7 @@ exports.saveTrip = function(data) {
         }
         else {
             console.log('successfully saved trip');
+			mcmf.runMCMF(data);
         }				
     });
 }

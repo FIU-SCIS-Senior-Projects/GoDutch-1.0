@@ -34,10 +34,12 @@ angular.module('indexApp').controller('mytripCtrl', ['$scope', 'socket', functio
 
 	// temporarily use number to represent persons. need personModel later.
 	$scope.addTrip = function() {
-		var newTrip = new tripModel("New Trip", "", [], [], [new personModel("test")]);
-		$scope.trips.unshift(newTrip);
-		$scope.currentTripIndex = 0;
-		$scope.viewTrip(0);
+		// var newTrip = new tripModel("New Trip", "", [], [], [new personModel("test")]);
+		// $scope.trips.unshift(newTrip);
+		// $scope.currentTripIndex = 0;
+		// $scope.viewTrip(0);
+		
+		createTest();
 		var room = "random";
 		socket.emit('room', room);
 	}
@@ -65,48 +67,33 @@ angular.module('indexApp').controller('mytripCtrl', ['$scope', 'socket', functio
 				mapPushHelper(i2cMap, curItem, curItem.consumers[j]);
 			}
 		}
+
+		$scope.saveTrip();
 	}
 
 	// for testing purpose only
-	$scope.createTest = function() {
-		var trip = new tripModel("", "", [], [], []);
-		trip.name = "trip1";
-		trip.id = "1234567";
+	var createTest = function() {
+		var trip = new tripModel("trip1", "", [], [], []);
 		var i;
 		for (i = 0; i < 15; i++) {
-			trip.consumers.push(new personModel("c"+i));
+			trip.consumers.push(new personModel("p"+i));
 		}
 		for (i = 0; i < 5; i++) {
-			trip.purchasers.push(new personModel("p"+i));
+			trip.purchasers.push(trip.consumers[i]);
 		}
 
 		for (i = 0; i < 15; i++) {
 			var name = "i"+i;
 			var purchasers = [trip.purchasers[i%5]];
+			var payments = [(i+1) * 5];
 			var consumers = [trip.consumers[(i+1)%15], 
 							 trip.consumers[(i+2)%15], 
 							 trip.consumers[(i+3)%15]];
-			var item = new itemModel(name, purchasers, consumers);
+			var item = new itemModel(name, purchasers, payments, consumers);
 			trip.items.push(item);
-			var j;
-			for (j = 0; j < purchasers.length; j++) {
-				mapPushHelper(p2iMap, purchasers[0], item);
-				mapPushHelper(i2pMap, item, purchasers[j]);
-			}
-			for (j = 0; j < consumers.length; j++) {
-				mapPushHelper(c2iMap, consumers[j], item);
-				mapPushHelper(i2cMap, item, consumers[j]);
-			}
 		}
-
-		
-		$scope.purchasers = trip.purchasers;
-		$scope.items = [];
-		for (var i = 0; i < trip.items.length; i++) {
-			$scope.items.push(trip.items[i]);
-		}
-		$scope.consumers = trip.consumers;
 		$scope.trips.push(trip);
+		$scope.viewTrip(0);
 	}
 
 	var hideAll = function() {

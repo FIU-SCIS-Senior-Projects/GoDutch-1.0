@@ -15,6 +15,7 @@ var Schema = new mongoose.Schema({
         purchasers: [{
             name: String 
         }],
+        payments: [],
         consumers: [{
             name: String 
         }]
