@@ -207,23 +207,25 @@ exports.runMCMF = function (trip) {
             addEdge(i, SINK, con.get(i), 1);
             // console.log(i, adj[i].length);
         }
-        
+                
         console.log(maxFlow());
+        var result = "";
         for (var i = 2; i < adj.length; i++) {
             // console.log(adj[i].length);
             for (var j = 0; j < adj[i].length; j++) {
                 var e = adj[i][j];
                 if (e.f && i == e.u && e.v != 1) {
-                    console.log(e.v, " needs to pay ", e.u, ": ", e.f, " dollars.");
-                    // console.log(n2pMap.get(e.v), " needs to pay ", n2pMap.get(e.u), ": ", e.f, " dollars.");
+                    result += (n2pMap.get(e.v) + " needs to pay " + n2pMap.get(e.u) + ": " + e.f.toFixed(2) + " dollars.\n");
                 }
             }
         }
+
+        return result;
     }
 
     function addSrcEdge(value, key, map) {
         addEdge(SRC, key, value, 1);
     }
 
-    parseTrip(trip);
+    return parseTrip(trip);
 };

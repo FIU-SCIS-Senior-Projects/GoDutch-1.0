@@ -38,9 +38,16 @@ exports.saveTrip = function(data) {
         }
         else {
             console.log('successfully saved trip');
-			mcmf.runMCMF(data);
         }				
     });
+}
+
+exports.deleteTrip = function(data) {
+    // Need Implementation after trip is linked to user.
+}
+
+exports.calculate = function(data) {
+	return mcmf.runMCMF(data);
 }
 
 exports.signup = function (req, res, next) {
