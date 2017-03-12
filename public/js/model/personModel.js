@@ -2,5 +2,6 @@
 
 function personModel(name) {
 	this.name = name;
-	this.active = true;
+	this.isPurchaser = true;
+	this.isConsumer = true;
 }

@@ -4,16 +4,16 @@
 		<div ng-repeat="trip in trips" class="tripListElement" ng-click="saveTrip()">
 			<img src="trip.png" class="avatar col-12">
 		</div>
-		<span title="add trip" ng-click="viewTrip()"><i class="material-icons" style="font-size:48px;">add_circle_outline</i></span>
+		<span title="add trip" ng-click="addTrip()"><i class="material-icons" style="font-size:48px;">add_circle_outline</i></span>
 	</div>
-	<div class="col-10">
+	<div class="col-7">
 		<div class="card">
 			<div class="card-header">
 				<h1>Purchasers</h1>
 			</div>
 			<div class="card-block row justify-content-center">
-				<div ng-repeat="purchaser in purchasers" class="tripDetailElement col-1" ng-mouseenter="enterPurchaser($index)" ng-mouseleave="leave()">
-					<img src="user.png" class="avatar" ng-class="{'fadeTransparent':!purchaser.active}">
+				<div ng-repeat="purchaser in purchasers" class="tripDetailElement col-2" ng-mouseenter="enterPurchaser($index)" ng-mouseleave="leave()">
+					<img src="user.png" class="avatar" ng-class="{'fadeTransparent':!purchaser.isPurchaser}">
 					<p>{{purchaser.name}}</p>
 				</div>
 			</div>
@@ -24,9 +24,12 @@
 				<h1 class="row">Items</h1>
 			</div>
 			<div class="card-block row justify-content-center">
-				<div ng-repeat="item in items" class="tripDetailElement col-1" ng-mouseenter="enterItem($index)" ng-mouseleave="leave()">
+				<div ng-repeat="item in items" class="tripDetailElement col-2" ng-mouseenter="enterItem($index)" ng-mouseleave="leave()" ng-click="editDetail($index)">
 					<img src="item.png" class="avatar" ng-class="{'fadeTransparent':!item.active}">
 					<p>{{item.name}}</p>
+				</div>
+				<div>
+					<span title="add item" ng-click="addItem()" ng-show="currentTripIndex>=0"><i class="material-icons tripDetailElement col-1" style="font-size:48px;">add_circle_outline</i></span>
 				</div>
 			</div>
 		</div>
@@ -36,10 +39,57 @@
 				<h1 class="row">Consumers</h1>
 			</div>
 			<div class="card-block row justify-content-center">
-				<div ng-repeat="consumer in consumers" class="tripDetailElement col-1" ng-mouseenter="enterConsumer($index)" ng-mouseleave="leave()">
-					<img src="user.png" class="avatar" ng-class="{'fadeTransparent':!consumer.active}">
+				<div ng-repeat="consumer in consumers" class="tripDetailElement col-2" ng-mouseenter="enterConsumer($index)" ng-mouseleave="leave()">
+					<img src="user.png" class="avatar" ng-class="{'fadeTransparent':!consumer.isConsumer}">
 					<p>{{consumer.name}}</p>
 				</div>
+			</div>
+		</div>
+	</div>
+	<div class="col-3 detail-container">
+		<div class="card" ng-show="showDetail">
+			<div class="card-header">
+				<h1>Detail</h1>
+			</div>
+			<div class="card-block justify-content-center">
+				<form class="col-12">
+					<div class="row detail-row">
+						<label for="detail-name" class="col-3 detail-label">Item</label>
+						<div class="col-9">
+							<input type="text" class="form-control loginform" id="detail-name" placeholder="New Item" ng-model="detail.currentItem.name">
+						</div>
+					</div>
+					<div class="row detail-row">
+						<label for="detail-amount" class="col-5 detail-label">You paid</label>
+						<div class="col-7">
+							<input type="text" class="form-control loginform" id="detail-amount" placeholder="$0.00" ng-model="detail.moneySpent" ng-change="paymentChange(detail.moneySpent)">
+						</div>
+					</div>
+					<div class="row detail-row">
+						<label for="detail-consume" class="col-8 detail-label">Did you consume</label>
+						<div class="col-4 detail-checkbox">
+							<input type="checkbox"  ng-model="detail.didConsume" ng-change="consumptionChange(detail.didConsume)">
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+		<div class="detail-button-container" ng-show="currentTripIndex>=0">
+			<div class="row">
+				<div class="col-6 text-center">
+					<button class="btn" ng-click="deleteTrip()">Quit Trip</button>
+				</div>
+				<div class="col-6 text-center">
+					<button class="btn" ng-click="calculate()">Calculate</button>
+				</div>
+			</div>
+		<div>
+		<div class="card" ng-show="showResult">
+			<div class="card-header">
+				<h1>Transactions</h1>
+			</div>
+			<div class="card-block justify-content-center">
+				{{result}}
 			</div>
 		</div>
 	</div>

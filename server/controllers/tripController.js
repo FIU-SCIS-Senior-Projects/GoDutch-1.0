@@ -1,6 +1,7 @@
 var mongoose = require('mongoose');
 var tripModel = mongoose.model('tripModel');
 var path = require("path");
+var mcmf = require("../services/mcmf");
 
 var getErrorMessage = function (err) {
 	var message = '';
@@ -39,6 +40,14 @@ exports.saveTrip = function(data) {
             console.log('successfully saved trip');
         }				
     });
+}
+
+exports.deleteTrip = function(data) {
+    // Need Implementation after trip is linked to user.
+}
+
+exports.calculate = function(data) {
+	return mcmf.runMCMF(data);
 }
 
 exports.signup = function (req, res, next) {
