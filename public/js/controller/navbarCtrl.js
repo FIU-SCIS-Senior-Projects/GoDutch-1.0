@@ -25,6 +25,8 @@ angular.module('indexApp').controller('navbarCtrl', ['$scope','$http','socket','
 							console.log(success);
 							$scope.$parent.isLoggedIn = true;
 							storage.put('token', res.data.token);
+							$scope.$parent.selectedTab = 'home';
+							storage.put('tab', 'home');
 						},function(error)
 						{
 							console.log(error);
@@ -48,10 +50,11 @@ angular.module('indexApp').controller('navbarCtrl', ['$scope','$http','socket','
 		})
 	}
 
-	$scope.$parent.selectedTab = 'mytrip';
+	
 
 	$scope.set = function(tab) {
 		$scope.$parent.selectedTab = tab;
+		storage.put('tab', tab);
 		console.log($scope.$parent.selectedTab);
 	}
 

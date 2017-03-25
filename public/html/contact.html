@@ -1,0 +1,26 @@
+<div class = "text-center">
+	<div id="map"></div>
+	<div class="row offset-4">
+		<div class="col-offset-4 col-4 col-offset-4">
+			<div class = "contact-form-area">
+				<form>
+					<h3>Contact</h3>
+					<div class = "form-group">
+						<input type="text" class="form-control" placeholder="Name" ng-model="User.name">
+					</div>
+					<div class = "form-group">
+						<input type="email" class="form-control" placeholder="Email" ng-model="User.email">
+					</div>
+					<div class = "form-group">
+						<input type="text" class="form-control" placeholder="Subject" ng-model="User.subject">
+					</div>
+					<div class = "form-group">
+						<textarea class="form-control" placeholder="Message" ng-model="User.message">
+					</div>
+
+			</form>
+			<button ng-click="send()" class="btn btn-primary contact-btn">SEND</button>
+	
+		</div>
+	</div>
+</div>

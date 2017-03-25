@@ -9,11 +9,14 @@
 		<script src="/socket.io/socket.io.js"></script>
 		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.7/angular-resource.min.js"></script>
 	</head>
-	<body ng-app="indexApp" ng-controller="mainCtrl">
-		<nav ng-controller="navbarCtrl" class="navbar" ng-include src="template.url"></nav>
+	<body ng-app="indexApp"  ng-controller="mainCtrl">
+		<nav ng-controller="navbarCtrl" class="navbar"  ng-include src="template.url"></nav>
 		<div class="container-fluid">
 			<div class="row">
-				<div ng-controller="signupCtrl" ng-show="!isLoggedIn" class="signup col-12" ng-include src="template.url"></div> 
+				<div ng-controller="signupCtrl" ng-show="!isLoggedIn" class="signup col-12" ng-include src="template.url"></div>
+				<div ng-controller="homeCtrl" ng-show="isLoggedIn && show()" class="home col-12 nopadding" ng-include src="template.url"></div>
+				<div ng-controller="aboutCtrl" ng-show="isLoggedIn && show()" class="about col-12 nopadding" ng-include src="template.url"></div>
+				<div ng-controller="contactCtrl" ng-show="isLoggedIn && show()" class="signup col-12" ng-include src="template.url"></div> 
 			    <div ng-controller="mytripCtrl" ng-show="isLoggedIn && show()" class="mytrip col-12" ng-include src="template.url"></div>
 		    </div>
 	    </div>
