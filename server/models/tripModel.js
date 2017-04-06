@@ -7,11 +7,15 @@ var Schema = new mongoose.Schema({
 		 required: [true, 'Need a trip name'],
 		 trim: true
      },
+     room: {
+         type: String,
+         unique: true
+     },
      purchasers: [{
          name: String 
      }],
      items: [{
-        itemname: String,
+        name: String,
         purchasers: [{
             name: String 
         }],

@@ -29,17 +29,50 @@ var getErrorMessage = function (err) {
 
 exports.saveTrip = function(data) {
     var Trip = new tripModel(data);
-    Trip.save(function (err) {
-        if (err) {
-            console.log(err);
-            console.log('========================================================================================================');
-            console.log(data);
-            console.log('error saving trip');
-        }
-        else {
-            console.log('successfully saved trip');
-        }				
-    });
+	var promise = new Promise((resolve, reject) => {
+		var update = {
+			$set: {
+				name: Trip.name, 
+				purchasers: Trip.purchasers,
+				items: Trip.items,
+				consumers: Trip.consumers
+			}
+		}
+		tripModel.findByIdAndUpdate(Trip.room, update, {new: true}, function(err, trip){
+			if (err) {
+				console.log(err.message);
+				reject(err);
+			}
+			else {
+				console.log('successfully saved trip');
+				resolve(trip.room);
+			}
+		});
+	});
+	return promise;
+}
+
+exports.createTrip = function(data) {
+    var Trip = new tripModel(data);
+	var promise = new Promise((resolve, reject) => {
+		Trip.save(function (err) {
+			if (err) {
+				console.log('error saving trip');
+				console.log(err);
+			}
+			else {
+				var _id = Trip.get("_id");
+				tripModel.findByIdAndUpdate(_id, {$set: {room: _id}}, {new: true}, function(err, trip){
+					if (err) reject(err);
+					else {
+						console.log('successfully created trip');
+						resolve(trip.room);
+					}
+				});
+			}
+		});
+	});
+	return promise;
 }
 
 exports.deleteTrip = function(data) {
@@ -52,11 +85,9 @@ exports.calculate = function(data) {
 
 exports.signup = function (req, res, next) {
 	if (req.user) { //If the user is already signed in
-	   	console.log('c');
 	   	res.send('success');						
 	} else {		
 		var User = new user(req.body);
-		console.log(User)		
 		User.provider = 'local';
 		User.save(function (err) {
 			if (err) { //If the creation of the new user didn't work

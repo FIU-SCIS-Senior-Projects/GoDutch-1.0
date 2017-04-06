@@ -1,8 +1,8 @@
 'use strict';
 
-function tripModel(name, id, purchasers, items, consumers) {
+function tripModel(name, room, purchasers, items, consumers) {
 	this.name = name;
-	this.id = id;
+	this.room = room;
 	this.purchasers = purchasers;
 	this.items = items;
 	this.consumers = consumers;

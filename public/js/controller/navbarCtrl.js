@@ -25,6 +25,7 @@ angular.module('indexApp').controller('navbarCtrl', ['$scope','$http','socket','
 							console.log(success);
 							$scope.$parent.isLoggedIn = true;
 							storage.put('token', res.data.token);
+							$scope.$parent.profile = res.data.profile;
 						},function(error)
 						{
 							console.log(error);

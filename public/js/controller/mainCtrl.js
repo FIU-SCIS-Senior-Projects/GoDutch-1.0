@@ -10,4 +10,6 @@ angular.module('indexApp').controller('mainCtrl', ['$scope','$http','socket','st
 			$scope.isLoggedIn = false;
 		}
 	);
+
+	$scope.profile;
 }]);

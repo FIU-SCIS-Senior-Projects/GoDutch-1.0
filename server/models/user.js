@@ -28,7 +28,7 @@ var Schema = new mongoose.Schema({
 	 	type: String,
 		required: [true, 'Provider is required']
 	 },
-	 triplist: [{type: mongoose.Schema.Types.ObjectId, ref: 'trip'}]
+	 triplist: [{type: mongoose.Schema.Types.ObjectId, ref: 'tripModel'}]
 });
 
 Schema.pre('save', function (next) {

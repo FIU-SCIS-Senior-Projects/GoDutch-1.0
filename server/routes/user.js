@@ -2,51 +2,66 @@ var passport = require('passport');
 var control = require('../controllers/user');
 var jwt = require('jsonwebtoken');
 var config = require('./../config/config.js');
+var mongoose = require('mongoose');
+var userModel = mongoose.model('user');
 module.exports = function (app) {
 	app.route('/')
 		.get(control.homepage);
-	
-	app.post('/', function(req,res){
+
+	app.post('/', function (req, res) {
 		console.log(req.user);
-		res.stats('login').send({user:req.user});
+		res.stats('login').send({ user: req.user });
 	});
 
-	app.route('/signup')				    
+	app.route('/signup')
 		.post(control.signup);
 
 	app.route('/success')
 		.get(control.success);
 	app.route('/signout')
 		.post(control.signout);
-   
+
    	app.route('/login')
 		.get(control.login);
-					
+
 	//app.post('/login', function (req, res) {
 	//	console.log(req.user);									    
 	//	res.status('login').send({user: req.user});							
 	//});
-		   
-//   	app.route('/users')
-//		.get(control.listUsers);
-								
+
+	//   	app.route('/users')
+	//		.get(control.listUsers);
+
 	app.route('/signin')
-		.post(function (req,res,next){
-			if(req.user){
-				res.json({message: 'already logged in'});
+		.post(function (req, res, next) {
+			if (req.user) {
+				res.json({ message: 'already logged in' });
 			}
-			passport.authenticate('local', function(err,user,info){
-				if(err) {return next(err)}
-				if(!user) {return res.json(401,{error: 'Unsuccessful Login'})}
-				var profile = {
-					username : user.username,
-					email : user.email,
-					id: user._id
-				}
-				
-				var token = jwt.sign(profile, config.jwtSecret, {expiresIn: config.expire});
-				res.json({token: token});
+			passport.authenticate('local', function (err, user, info) {
+				if (err) { return next(err) }
+				if (!user) { return res.json(401, { error: 'Unsuccessful Login' }) }
+				var trips = [];
+
+
+				userModel.findById(user._id)
+					.populate('triplist') 
+					.exec(function (err, user) {
+						if (err) return handleError(err);
+						trips = user.triplist;
+
+						var profile = {
+							username: user.username,
+							email: user.email,
+							id: user._id,
+							trips: trips
+						};
+
+						var token = jwt.sign(profile, config.jwtSecret, { expiresIn: config.expire });
+						res.json({ token: token, profile: profile });
+						console.log("profile: ", profile);
+					});
+
 			})(req, res, next);
 		});
-									
+
 };
