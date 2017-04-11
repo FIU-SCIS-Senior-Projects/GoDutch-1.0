@@ -18,7 +18,9 @@ angular.module('indexApp').controller('navbarCtrl', ['$scope','$http','socket','
 		then (
 			function(res){//success
 				socket.connect(res.data.token);
+				socket.emit('invite', 'Lonely@farmersOnly.com');
 				console.log(res.data.token);
+				console.log(res);
 				if(res.data.token){
 					$scope.$parent.isLoggedIn = true;
 					storage.put('token', res.data.token);

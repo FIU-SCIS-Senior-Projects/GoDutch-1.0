@@ -1,9 +1,31 @@
 var tripController = require('../controllers/tripController')
 var mongoose = require('mongoose');
 var userModel = mongoose.model('user');
+var 
 
 module.exports = function (socket, io) {
 
+	socket.on('invite', function(data){
+		var newUser = {
+			username: data.email,
+			email: data.email,
+			password: data.email,
+			provider: 'local'
+		}
+		var User = new userModel(newUser);
+		User.save(function(err){	
+			if(err){
+				socket.emit('Error', err);
+			}
+			else{
+				salt = User.salt
+				tripID = data.id
+				var hash = crypto.createHmac('sha512', this.salt);
+				hash.update(tripID)
+				
+			}
+		});
+	});
 	socket.on('saveTrip', function (data) {
 		tripController.saveTrip(data).then(
 			function(room) {

@@ -34,9 +34,6 @@ module.exports = function (app) {
 
 	app.route('/signin')
 		.post(function (req, res, next) {
-			if (req.user) {
-				res.json({ message: 'already logged in' });
-			}
 			passport.authenticate('local', function (err, user, info) {
 				if (err) { return next(err) }
 				if (!user) { return res.json(401, { error: 'Unsuccessful Login' }) }
