@@ -20,6 +20,7 @@ angular.module('indexApp').controller('signupCtrl', ['$scope','$http','socket','
 					$scope.$parent.isLoggedIn = true;
 					socket.connect(response.data.token);
 					storage.put("token", response.data.token);
+					$scope.$parent.profile = response.data.profile;
 				},        
 				function(response){				
 					//                        // failure callback

@@ -15,7 +15,7 @@ app.factory('socket', function ($q) {
 				'query' : 'token=' + token
 			}).on('success',function(msg){
 				console.log(msg);
-			});			
+			});
 		},
 		isConnected: function(token){
 			var deferred = $q.defer();

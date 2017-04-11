@@ -9,8 +9,6 @@ angular.module('indexApp').controller('mytripCtrl', ['$scope', 'socket', functio
 	$scope.showResult = false;
 	$scope.result = "";
 
-	$scope.username = "p0";
-	$scope.trips = [];
 	$scope.purchasers = [];
 	$scope.items = [];
 	$scope.consumers = [];
@@ -36,22 +34,46 @@ angular.module('indexApp').controller('mytripCtrl', ['$scope', 'socket', functio
 
 	// temporarily use number to represent persons. need personModel later.
 	$scope.addTrip = function() {
-		// var newTrip = new tripModel("New Trip", "", [], [], [new personModel("test")]);
-		// $scope.trips.unshift(newTrip);
+		var newTrip = new tripModel("New Trip", "", [], [], [new personModel($scope.$parent.profile.username)]);
+		$scope.$parent.profile.trips.unshift(newTrip);
 		$scope.currentTripIndex = 0;
-		// $scope.viewTrip(0);
-		
-		createTest();
-		var room = "random";
-		socket.emit('room', room);
+		$scope.viewTrip(0);
 	}
 
 	// add parameter index to select a trip from trip list.
 	$scope.viewTrip = function(index) {
-		var curTrip = $scope.trips[index];
-		$scope.purchasers = curTrip.purchasers;
-		$scope.items = curTrip.items;
-		$scope.consumers = curTrip.consumers;
+		$scope.currentTripIndex = index;
+		var curTrip = $scope.$parent.profile.trips[index];
+		$scope.purchasers = [];
+		$scope.items = [];
+		$scope.consumers = [];
+		curTrip.consumers.forEach(function(c) {
+			$scope.consumers.push(new personModel(c.name));
+		});	
+		curTrip.purchasers.forEach(function(p) {
+			$scope.purchasers.push($scope.consumers.find(function(ele){
+				return ele.name === p.name;
+			}));
+		});
+		curTrip.items.forEach(function(i) {
+			var pur = [];
+			var pay = [];
+			var con = [];
+			i.purchasers.forEach(function(p) {
+				pur.push($scope.consumers.find(function(ele){
+					return ele.name === p.name;
+				}));
+			});
+			i.payments.forEach(function(p) {
+				pay.push(p);
+			});
+			i.consumers.forEach(function(c) {
+				con.push($scope.consumers.find(function(ele){
+					return ele.name === c.name;
+				}));
+			});
+			$scope.items.push(new itemModel(i.name, pur, pay, con));
+		})
 		p2iMap = new Map();
 		i2pMap = new Map();
 		i2cMap = new Map();
@@ -59,7 +81,6 @@ angular.module('indexApp').controller('mytripCtrl', ['$scope', 'socket', functio
 		var i, j;
 		for (i = 0; i < $scope.items.length; i++) {
 			var curItem = $scope.items[i];
-			// console.log("purchasers: ", curItem.purchasers);
 			for (j = 0; j < curItem.purchasers.length; j++) {
 				mapPushHelper(p2iMap, curItem.purchasers[j], curItem);
 				mapPushHelper(i2pMap, curItem, {purchaser: curItem.purchasers[j],
@@ -70,7 +91,6 @@ angular.module('indexApp').controller('mytripCtrl', ['$scope', 'socket', functio
 				mapPushHelper(i2cMap, curItem, curItem.consumers[j]);
 			}
 		}
-		$scope.saveTrip();
 	}
 
 	// for testing purpose only
@@ -94,7 +114,8 @@ angular.module('indexApp').controller('mytripCtrl', ['$scope', 'socket', functio
 			var item = new itemModel(name, purchasers, payments, consumers);
 			trip.items.push(item);
 		}
-		$scope.trips.push(trip);
+		$scope.$parent.profile.trips.unshift(trip);
+		$scope.currentTripIndex = 0;
 		$scope.viewTrip(0);
 	}
 
@@ -136,7 +157,6 @@ angular.module('indexApp').controller('mytripCtrl', ['$scope', 'socket', functio
 		var cur = $scope.items[index];
 		cur.active = true;
 		var list = i2pMap.get(cur);
-		console.log(list);
 		for (var i = 0; list && i < list.length; i++) 
 			list[i].purchaser.isPurchaser = true;
 		list = i2cMap.get(cur);		
@@ -155,20 +175,22 @@ angular.module('indexApp').controller('mytripCtrl', ['$scope', 'socket', functio
 	}
 
 	$scope.saveTrip = function() {
-		if ($scope.trips)
-			socket.emit('saveTrip', $scope.trips[$scope.currentTripIndex]);
+		if ($scope.$parent.profile.trips) {
+			socket.emit('saveTrip', $scope.$parent.profile.trips[$scope.currentTripIndex]);
+		}
 	}
 
 	$scope.deleteTrip = function() {
-		if ($scope.trips)
-			socket.emit('deleteTrip', $scope.trips[$scope.currentTripIndex]);
+		if ($scope.$parent.profile.trips)
+			socket.emit('deleteTrip', $scope.$parent.profile.trips[$scope.currentTripIndex]);
 	}
 
 	$scope.addItem = function() {
-		$scope.detail.currentItem = new itemModel("New Item", [], [], $scope.consumers);
+		var consumers = $scope.consumers.slice();
+		$scope.detail.currentItem = new itemModel("New Item", [], [], consumers);
 		$scope.detail.moneySpent = 0.00;
 		$scope.detail.didConsume = true;
-		$scope.trips[$scope.currentTripIndex].items.push($scope.detail.currentItem);
+		$scope.$parent.profile.trips[$scope.currentTripIndex].items.push($scope.detail.currentItem);
 		$scope.viewTrip($scope.currentTripIndex);
 	}
 
@@ -179,24 +201,41 @@ angular.module('indexApp').controller('mytripCtrl', ['$scope', 'socket', functio
 		$scope.detail.didConsume = false;
 		var list = i2pMap.get(cur);
 		for (i = 0; list && i < list.length; i++)
-			if (list[i].purchaser.name === $scope.username) {
+			if (list[i].purchaser.name === $scope.$parent.profile.username) {
 				$scope.detail.moneySpent = list[i].payment;
 			}
 		list = i2cMap.get(cur);
 		for (i = 0; list && i < list.length; i++)
-			if (list[i].name === $scope.username)
+			if (list[i].name === $scope.$parent.profile.username)
 				$scope.detail.didConsume = true;
-		$scope.detail.currentItem = $scope.trips[$scope.currentTripIndex].items[index];
-				console.log($scope.detail.moneySpent);
+		$scope.detail.currentItem = $scope.$parent.profile.trips[$scope.currentTripIndex].items[index];
 		$scope.showDetail = true;
 	}
 
 	var findUser = function(person) { 
-		return person.name === $scope.username;
+		return person.name === $scope.$parent.profile.username;
 	}
 
 	var findPurchaser = function(item) {
 		return item.purchasers.find(findUser);
+	}
+
+	var amountTimeout;
+	$scope.inputChanged = function(payment){
+		if (amountTimeout) clearTimeout(amountTimeout);
+		tripTimeout = setTimeout(function () {
+			$scope.paymentChange(payment);
+			console.log('changed');
+		}, 750);
+	}
+
+	var findWithAttr = function(array, value) {
+		for(var i = 0; i < array.length; i++) {
+			if(array[i].name === value) {
+				return i;
+			}
+		}
+		return -1;
 	}
 
 	$scope.paymentChange = function(payment) {
@@ -208,22 +247,22 @@ angular.module('indexApp').controller('mytripCtrl', ['$scope', 'socket', functio
 				$scope.detail.currentItem.purchasers.push(user);
 				$scope.detail.currentItem.payments.push(parseFloat(payment));
 				if (!$scope.purchasers.find(findUser)) {
-					$scope.trips[$scope.currentTripIndex].purchasers.push(user);
+					$scope.$parent.profile.trips[$scope.currentTripIndex].purchasers.push(user);
 				}
 			} else {
 				var user = $scope.consumers.find(findUser);
-				var index = $scope.detail.currentItem.purchasers.indexOf(user);
+				var index = findWithAttr($scope.detail.currentItem.purchasers, user.name);
 				$scope.detail.currentItem.payments[index] = payment;
 			}
 		} else {
 			if (list != null && list.find(findUser)) {
 				var user = $scope.consumers.find(findUser);
-				var index = $scope.detail.currentItem.purchasers.indexOf(user);
+				var index = findWithAttr($scope.detail.currentItem.purchasers, user.name);
 				$scope.detail.currentItem.purchasers.splice(index, 1);
 				$scope.detail.currentItem.payments.splice(index, 1);
-				if (!$scope.items.find(findPurchaser)) {
-					index = $scope.trips[$scope.currentTripIndex].purchasers.indexOf(user);
-					$scope.trips[$scope.currentTripIndex].purchasers.splice(index, 1);
+				if (!$scope.$parent.profile.trips[$scope.currentTripIndex].items.find(findPurchaser)) {
+					index = findWithAttr($scope.$parent.profile.trips[$scope.currentTripIndex].purchasers, user.name);
+					$scope.$parent.profile.trips[$scope.currentTripIndex].purchasers.splice(index, 1);
 				}
 			}
 		}
@@ -238,7 +277,7 @@ angular.module('indexApp').controller('mytripCtrl', ['$scope', 'socket', functio
 		} else {
 			if (list != null && list.find(findUser)) {
 				var user = $scope.consumers.find(findUser);
-				var index = $scope.detail.currentItem.consumers.indexOf(user);
+				var index = findWithAttr($scope.detail.currentItem.consumers, user.name);
 				$scope.detail.currentItem.consumers.splice(index, 1);
 			}
 		}
@@ -246,12 +285,37 @@ angular.module('indexApp').controller('mytripCtrl', ['$scope', 'socket', functio
 	}
 
 	$scope.calculate = function() {
-		if ($scope.trips)
-			socket.emit('calculate', $scope.trips[$scope.currentTripIndex]);
+		if ($scope.$parent.profile.trips)
+			socket.emit('calculate', $scope.$parent.profile.trips[$scope.currentTripIndex]);
 	}
 
-	socket.on('result', function (data) {
+	socket.on('result', function(data) {
 		$scope.result = data;
 		$scope.showResult = true;
 	});
+
+	socket.on('saveSuccess', function(room) {
+		console.log("ROOM: ", room);
+		if ($scope.$parent.profile.trips[$scope.currentTripIndex].room == "") {
+			$scope.$parent.profile.trips[$scope.currentTripIndex].room = room;
+			socket.emit('room', room);
+		}
+	});
+
+	socket.on('saveFailure', function(error) {
+		console.log(err.message);
+	});
+
+	var tripTimeout;
+	$scope.$watch('profile.trips[currentTripIndex]',
+		function (newValue, oldValue) {
+			if (newValue !== oldValue) {
+				if (tripTimeout) clearTimeout(tripTimeout);
+				tripTimeout = setTimeout(function () {
+					$scope.saveTrip();
+					console.log('saved');
+				}, 750);
+			}
+		}, true
+	);
 }]);

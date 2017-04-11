@@ -1,0 +1,4 @@
+improve UI for login text boxes
+Make signup toggle, and access it from other files
+Enable both Username/email for login
+Change messages returned from server

@@ -1,7 +1,7 @@
 var mongoose = require('mongoose');
 var jwt = require('jsonwebtoken');
 var config = require('./../config/config');
-var user = mongoose.model('user');
+var userModel = mongoose.model('user');
 var path = require("path");
 
 var getErrorMessage = function (err) {
@@ -53,7 +53,7 @@ exports.signup = function (req, res, next) {
 	   	console.log('c');
 	   	res.send('success');						
 	} else {		
-		var User = new user(req.body);
+		var User = new userModel(req.body);
 		console.log(User);
 		User.provider = 'local';
 		User.save(function (err) {
@@ -64,15 +64,15 @@ exports.signup = function (req, res, next) {
 				req.login(User, function (err) {
 					if (err) return next(err);
 					else {
-						
 						var profile = {
 							username : User.username,
 							email : User.email,
-							id: User._id
+							id: User._id,
+							trips: []
 						}
 				
 						var token = jwt.sign(profile, config.jwtSecret, {expiresIn: config.expire});
-						res.json({token: token});
+						res.json({token: token, profile: profile});
 
 					}						
 				});					
