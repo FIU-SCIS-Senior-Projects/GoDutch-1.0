@@ -1,5 +1,6 @@
 var http = require('http')
 var fs = require('fs');
+var jwtDecode = require('jsonwebtoken');
 
 var mongoose = require('mongoose')
 var root = __dirname;
@@ -25,20 +26,24 @@ require('./server/config/index')(app);
 
 app.use(express.static(__dirname + '/dist/public'));
 
-var server = http.createServer(app)
-var sio = require('socketio-jwt');
+var server = http.createServer(app);
 var io = require('socket.io')(server);
 
-io.use(sio.authorize({
-	  secret: config.jwtSecret,
-	  handshake: true
-}));
-
 io.sockets.on('connection', function(socket) {
-	console.log(socket.decoded_token.email);
-	io.emit('success', {data: 'welcome'});
+//	console.log(socket.decoded_token.email);
 	require('./server/routes/tripRoute')(socket, io);
 
+	socket.on('auth', function(data){
+		jwtDecode.verify(data, config.jwtSecret, function(err, decoded){
+			if(err){
+				socket.emit('Error', {'name': err.name, 'message': err.message});
+			}
+			else{
+				socket.decoded_token = decoded;
+				socket.emit('success', decoded);
+			}
+		});
+	});
 	socket.on('test', function(data) {
 		console.log('data', data);
 	});

@@ -17,20 +17,13 @@ angular.module('indexApp').controller('navbarCtrl', ['$scope','$http','socket','
 		$http.post('/signin', $scope.newLogin, config).
 		then (
 			function(res){//success
+				socket.connect(res.data.token);
+				console.log(res.data.token);
 				if(res.data.token){
-					socket.isConnected(res.data.token).
-					then(
-						function(success)
-						{
-							console.log(success);
-							$scope.$parent.isLoggedIn = true;
-							storage.put('token', res.data.token);
-							$scope.$parent.profile = res.data.profile;
-						},function(error)
-						{
-							console.log(error);
-						}
-					);
+					$scope.$parent.isLoggedIn = true;
+					storage.put('token', res.data.token);
+					console.log(res.data.token);
+					$scope.$parent.profile = res.data.profile;
 				}
 			},function(res){//failure
 				console.log(res.data.error);

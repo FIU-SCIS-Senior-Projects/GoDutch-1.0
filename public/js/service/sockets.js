@@ -1,7 +1,7 @@
 'use strict';
 
 app.factory('socket', function ($q) {  
-	var socket;
+	var socket = io.connect();
 	return {
 		on: function (eventName, callback) {
 			socket.on(eventName, callback);
@@ -11,17 +11,13 @@ app.factory('socket', function ($q) {
 		},
 		connect: function(token){
 			console.log('TOKEN ATTEMPTING TO CONNECT', token);
-			socket = io.connect('', {
-				'query' : 'token=' + token
-			}).on('success',function(msg){
-				console.log(msg);
-			});
+			socket.emit('auth', token);
+			return true;
 		},
 		isConnected: function(token){
 			var deferred = $q.defer();
-			socket = io.connect('', {
-				'query': 'token=' + token
-			}).on('error', function(error){
+			console.log(token);
+			socket.emit('auth', token).on('Error', function(error){
 				deferred.reject(error);
 			}).on('success', function(msg){
 				deferred.resolve(msg);
