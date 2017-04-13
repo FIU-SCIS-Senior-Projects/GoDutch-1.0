@@ -1,8 +1,5 @@
 var mongoose = require('mongoose');
 var jwt = require('jsonwebtoken');
-var crypto = require('crypto'),
-	algorithm = 'aes-256-ctr';
-var email = require('./../config/emailConfig');
 var config = require('./../config/config');
 var userModel = mongoose.model('user');
 var path = require("path");
@@ -43,25 +40,6 @@ exports.homepage = function (req, res) {
 	res.sendFile(path.resolve(__dirname + '/../../dist/public/index.html'));
 };
 
-exports.login = function (req, res) {
-	if (!req.user) {
-		res.send('you need to login');				    
-	} else {		
-		res.render('you are already signed in');								    
-	}
-};
-
-exports.joinTrip = function(req,res){
-	request = req.url.substring(3,req.url.length);
-	options = email();
-	
-	var decipher = crypto.createDecipher(algorithm,options.secret);
-	var dec = decipher.update(request, 'base64', 'utf8');
-	dec += decipher.final('utf8');
-	console.log(dec.split(' '))
-
-
-}
 
 exports.signup = function (req, res, next) {
 	if (req.user) { //If the user is already signed in

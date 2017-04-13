@@ -62,7 +62,18 @@ angular.module('indexApp').controller('mytripCtrl', ['$scope', 'socket', functio
 		else {
 			var email = $scope.userToInvite.email;
 			var tripid = $scope.$parent.trips[$scope.currentTripIndex].room;
-
+			socket.emit('invite', 
+					{email: email,
+					id: tripid
+				});
+				socket.on('successEmail', function(data){
+					console.log('EMAIL SUCCRESS');
+					console.log(data);
+				});
+				socket.on('emailError', function(err){
+					console.log(err);
+					console.log('ERROR SENDING EMAIL');
+				});		
 		}
 	}
 

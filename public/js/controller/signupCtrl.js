@@ -21,6 +21,7 @@ angular.module('indexApp').controller('signupCtrl', ['$scope','$http','socket','
 					storage.put("token", response.data.token);
 					$scope.$parent.profile = response.data.profile;
 					$scope.$parent.trips.length = 0;
+					socket.emit('auth', response.data.token);
 				},        
 				function(response){
 					console.log(response);

@@ -1,10 +1,30 @@
 'use strict';
 
-angular.module('indexApp').controller('navbarCtrl', ['$scope','$http','socket','storage', function($scope, $http, socket,storage){
+angular.module('indexApp').controller('navbarCtrl', ['$location','$scope','$http','socket','storage', function($location, $scope, $http, socket,storage){
 	// selectedTab = 'mytrip';
 	$scope.template = { name: 'navbar.html', url: '/html/navbar.html'};
 	$scope.newLogin = {}
-	
+	var keywords = ['home', 'mytrip', 'contact', 'about'];
+	if($location.url()){
+		var param = $location.url().substring(1, $location.url().length);
+		if (keywords.indexOf(param) < -1){
+			socket.emit('cipher', param);
+			socket.on('decipher', function(data){
+				$scope.$parent.isLoggedIn = true;	
+				storage.put('token', data.token);	
+				$scope.$parent.profile = data.profile;
+				var triplist = res.data.trips;
+				$scope.$parent.trips.length = 0;
+				for (var i = 0; i < triplist.length; i++) {
+					$scope.$parent.trips.push(triplist[i]);
+					socket.emit('joinroom', triplist[i].room, $scope.$parent.profile.username);
+				}
+			socket.emit('joinTrip', {userid: $scope.$parent.profile.id, username: $scope.$parent.profile.username, tripid: $scope.$parent.profile.tripid});
+				
+			});
+		}
+	}
+
 	var config = {
 		headers : {		
 			'Content-Type': 'application/json'
@@ -17,17 +37,6 @@ angular.module('indexApp').controller('navbarCtrl', ['$scope','$http','socket','
 		$http.post('/signin', $scope.newLogin, config).
 		then (
 			function(res){//success
-				socket.emit('invite', {email: 'jbelt021@fiu.edu',
-					id: 123
-				});
-				socket.on('successEmail', function(data){
-					console.log('EMAIL SUCCRESS');
-					console.log(data);
-				})
-				socket.on('emailError', function(err){
-					console.log(err);
-					console.log('ERROR SENDING EMAIL');
-				});
 				console.log(res.data.token);
 				console.log(res);
 				if(res.data.token){
@@ -35,6 +44,7 @@ angular.module('indexApp').controller('navbarCtrl', ['$scope','$http','socket','
 					storage.put('token', res.data.token);
 					$scope.$parent.profile = res.data.profile;
 					var triplist = res.data.trips;
+					socket.emit('auth', res.data.token);
 					$scope.$parent.trips.length = 0;
 					for (var i = 0; i < triplist.length; i++) {
 						$scope.$parent.trips.push(triplist[i]);

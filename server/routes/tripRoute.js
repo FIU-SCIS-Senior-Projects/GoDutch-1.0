@@ -8,6 +8,34 @@ var crypto = require('crypto'),
 
 module.exports = function (socket, io, clients, index) {
 
+	socket.on('cipher', function(link){
+		request = link;
+		options = email();
+	
+		var decipher = crypto.createDecipher(algorithm,options.secret);
+		var dec = decipher.update(request, 'base64', 'utf8');
+		dec += decipher.final('utf8');
+		email = dec.split(' ')[0]
+		trip_id = dec.split(' ')[1]
+
+		var query = userModel.findOne({email:email});
+		query.populate('triplist')
+		.exec(function (err, user) {
+			if (err) socket.emit('cipherError', err);
+			console.log(user.triplist);
+			var profile = {
+				username: user.username,
+				email: user.email,
+				id: user._id,
+				tripid: trip_id
+			};
+
+			var trips = user.triplist;
+			var token = jwt.sign(profile, config.jwtSecret, { expiresIn: config.expire });
+		socket.emit('decipher', {profile:profile, trips:trips, token:token});
+		});
+	});
+
 	socket.on('invite', function(data){
 		var options = email();
 		var transporter = nodemailer.createTransport({
@@ -31,7 +59,7 @@ module.exports = function (socket, io, clients, index) {
 				var cipher = crypto.createCipher(algorithm, options.secret);
 				var link = cipher.update(data.email + ' ' + data.id.toString(),'utf8','base64');
 				link += cipher.final('base64');
-				mailOptions.text = 'http://192.168.56.100/j/' + link.toString("utf-8");
+				mailOptions.text = 'http://192.168.56.100/#' + link.toString("utf-8");
 				console.log('transporter going here');
 				transporter.sendMail(mailOptions, function(error,info){
 					console.log('FINALLY HERE');

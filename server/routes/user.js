@@ -12,8 +12,6 @@ module.exports = function (app) {
 		console.log(req.user);
 		res.stats('login').send({ user: req.user });
 	});
-	app.route('/j/*')
-		.get(control.joinTrip);
 	app.route('/signup')
 		.post(control.signup);
 
@@ -21,10 +19,6 @@ module.exports = function (app) {
 		.get(control.success);
 	app.route('/signout')
 		.post(control.signout);
-
-   	app.route('/login')
-		.get(control.login);
-
 	//app.post('/login', function (req, res) {
 	//	console.log(req.user);									    
 	//	res.status('login').send({user: req.user});							
