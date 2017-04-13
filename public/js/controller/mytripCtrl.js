@@ -2,7 +2,9 @@
 
 angular.module('indexApp').controller('mytripCtrl', ['$scope', 'socket', function($scope, socket){
 	$scope.template = { name: 'mytrip.html', url: '/html/mytrip.html'};
-
+	$scope.newTrip = { name: "New Trip" };
+	$scope.tripToJoin = { id: "" };
+	$scope.userToInvite = { email: "" };
 	$scope.show = function(){
 		return $scope.$parent.selectedTab === 'mytrip'
 	}
@@ -32,18 +34,70 @@ angular.module('indexApp').controller('mytripCtrl', ['$scope', 'socket', functio
 		map.get(key).push(value);
 	}
 
+	var inputInterval = 1000;
+
 	// temporarily use number to represent persons. need personModel later.
 	$scope.addTrip = function() {
-		var newTrip = new tripModel("New Trip", "", [], [], [new personModel($scope.$parent.profile.username)]);
-		$scope.$parent.profile.trips.unshift(newTrip);
-		$scope.currentTripIndex = 0;
-		$scope.viewTrip(0);
+		var newTrip = new tripModel($scope.newTrip.name, "", [], [], [new personModel($scope.$parent.profile.username)]);
+		socket.emit('createTrip', newTrip);
 	}
+
+	$scope.joinTrip = function() {
+		var tripid = $scope.tripToJoin.id;
+		console.log('triptojoin: ', $scope.tripToJoin);
+		var exist = false;
+		for (var i = 0; i < $scope.$parent.trips.length; i++)
+			if ($scope.$parent.trips[i].room === tripid)
+				exist = true;
+		console.log($scope.$parent.profile.id, $scope.$parent.profile.username, tripid);
+		if (!exist)
+			socket.emit('joinTrip', {userid: $scope.$parent.profile.id, username: $scope.$parent.profile.username, tripid: tripid});
+		else
+			console.log('you are already in this trip');
+	}
+
+	$scope.invite = function() {
+		if ($scope.currentTripIndex < 0)
+			console.log("You need to be in a trip");
+		else {
+			var email = $scope.userToInvite.email;
+			var tripid = $scope.$parent.trips[$scope.currentTripIndex].room;
+
+		}
+	}
+
+	socket.on('joinTripSuccess', function(room) {
+		console.log(room, 'here');
+		socket.emit('joinroom', room, $scope.$parent.profile.username);
+		$scope.currentTripIndex = 0;
+		$scope.loadTrip();
+	});
+
+	socket.on('joinTripFailure', function(error) {
+		console.log('Failed to join trip', error.message);
+	});
+
+	$scope.loadTrip = function() {
+		socket.emit('loadTrip', $scope.$parent.profile.id);
+	}
+
+	socket.on('loadTripSuccess', function(triplist) {
+		$scope.$parent.trips.length = 0;
+		for (var i = 0; i < triplist.length; i++)
+			$scope.$parent.trips.push(triplist[i]);
+		console.log('loadTripSuccess: ', triplist);
+		$scope.$apply();
+		$scope.viewTrip($scope.currentTripIndex);
+	});
+
+	socket.on('loadTripFailure', function(error) {
+		console.log('Failed to load trip', error.message);
+	});
 
 	// add parameter index to select a trip from trip list.
 	$scope.viewTrip = function(index) {
 		$scope.currentTripIndex = index;
-		var curTrip = $scope.$parent.profile.trips[index];
+		var curTrip = $scope.$parent.trips[index];
 		$scope.purchasers = [];
 		$scope.items = [];
 		$scope.consumers = [];
@@ -52,7 +106,7 @@ angular.module('indexApp').controller('mytripCtrl', ['$scope', 'socket', functio
 		});	
 		curTrip.purchasers.forEach(function(p) {
 			$scope.purchasers.push($scope.consumers.find(function(ele){
-				return ele.name === p.name;
+				return p && ele.name === p.name;
 			}));
 		});
 		curTrip.items.forEach(function(i) {
@@ -61,7 +115,7 @@ angular.module('indexApp').controller('mytripCtrl', ['$scope', 'socket', functio
 			var con = [];
 			i.purchasers.forEach(function(p) {
 				pur.push($scope.consumers.find(function(ele){
-					return ele.name === p.name;
+					return p && ele.name === p.name;
 				}));
 			});
 			i.payments.forEach(function(p) {
@@ -69,7 +123,7 @@ angular.module('indexApp').controller('mytripCtrl', ['$scope', 'socket', functio
 			});
 			i.consumers.forEach(function(c) {
 				con.push($scope.consumers.find(function(ele){
-					return ele.name === c.name;
+					return c && ele.name === c.name;
 				}));
 			});
 			$scope.items.push(new itemModel(i.name, pur, pay, con));
@@ -114,7 +168,7 @@ angular.module('indexApp').controller('mytripCtrl', ['$scope', 'socket', functio
 			var item = new itemModel(name, purchasers, payments, consumers);
 			trip.items.push(item);
 		}
-		$scope.$parent.profile.trips.unshift(trip);
+		$scope.$parent.trips.unshift(trip);
 		$scope.currentTripIndex = 0;
 		$scope.viewTrip(0);
 	}
@@ -175,14 +229,14 @@ angular.module('indexApp').controller('mytripCtrl', ['$scope', 'socket', functio
 	}
 
 	$scope.saveTrip = function() {
-		if ($scope.$parent.profile.trips) {
-			socket.emit('saveTrip', $scope.$parent.profile.trips[$scope.currentTripIndex]);
+		if ($scope.$parent.trips && $scope.$parent.trips[$scope.currentTripIndex]) {
+			socket.emit('saveTrip', $scope.$parent.trips[$scope.currentTripIndex]);
 		}
 	}
 
 	$scope.deleteTrip = function() {
-		if ($scope.$parent.profile.trips)
-			socket.emit('deleteTrip', $scope.$parent.profile.trips[$scope.currentTripIndex]);
+		if ($scope.$parent.trips)
+			socket.emit('deleteTrip', $scope.$parent.trips[$scope.currentTripIndex]);
 	}
 
 	$scope.addItem = function() {
@@ -190,7 +244,7 @@ angular.module('indexApp').controller('mytripCtrl', ['$scope', 'socket', functio
 		$scope.detail.currentItem = new itemModel("New Item", [], [], consumers);
 		$scope.detail.moneySpent = 0.00;
 		$scope.detail.didConsume = true;
-		$scope.$parent.profile.trips[$scope.currentTripIndex].items.push($scope.detail.currentItem);
+		$scope.$parent.trips[$scope.currentTripIndex].items.push($scope.detail.currentItem);
 		$scope.viewTrip($scope.currentTripIndex);
 	}
 
@@ -208,7 +262,7 @@ angular.module('indexApp').controller('mytripCtrl', ['$scope', 'socket', functio
 		for (i = 0; list && i < list.length; i++)
 			if (list[i].name === $scope.$parent.profile.username)
 				$scope.detail.didConsume = true;
-		$scope.detail.currentItem = $scope.$parent.profile.trips[$scope.currentTripIndex].items[index];
+		$scope.detail.currentItem = $scope.$parent.trips[$scope.currentTripIndex].items[index];
 		$scope.showDetail = true;
 	}
 
@@ -221,12 +275,22 @@ angular.module('indexApp').controller('mytripCtrl', ['$scope', 'socket', functio
 	}
 
 	var amountTimeout;
-	$scope.inputChanged = function(payment){
+	$scope.amountChanged = function(payment){
 		if (amountTimeout) clearTimeout(amountTimeout);
-		tripTimeout = setTimeout(function () {
+		amountTimeout = setTimeout(function () {
 			$scope.paymentChange(payment);
-			console.log('changed');
-		}, 750);
+			console.log('change');
+		}, inputInterval);
+	}
+
+	var nameTimeout;
+	$scope.nameChanged = function(name){
+		clearTimeout(nameTimeout);
+		console.log('timeout: ', nameTimeout);
+		nameTimeout = setTimeout(function () {
+			$scope.detail.currentItem.name = name;
+			console.log('change');
+		}, inputInterval);
 	}
 
 	var findWithAttr = function(array, value) {
@@ -247,7 +311,7 @@ angular.module('indexApp').controller('mytripCtrl', ['$scope', 'socket', functio
 				$scope.detail.currentItem.purchasers.push(user);
 				$scope.detail.currentItem.payments.push(parseFloat(payment));
 				if (!$scope.purchasers.find(findUser)) {
-					$scope.$parent.profile.trips[$scope.currentTripIndex].purchasers.push(user);
+					$scope.$parent.trips[$scope.currentTripIndex].purchasers.push(user);
 				}
 			} else {
 				var user = $scope.consumers.find(findUser);
@@ -260,9 +324,9 @@ angular.module('indexApp').controller('mytripCtrl', ['$scope', 'socket', functio
 				var index = findWithAttr($scope.detail.currentItem.purchasers, user.name);
 				$scope.detail.currentItem.purchasers.splice(index, 1);
 				$scope.detail.currentItem.payments.splice(index, 1);
-				if (!$scope.$parent.profile.trips[$scope.currentTripIndex].items.find(findPurchaser)) {
-					index = findWithAttr($scope.$parent.profile.trips[$scope.currentTripIndex].purchasers, user.name);
-					$scope.$parent.profile.trips[$scope.currentTripIndex].purchasers.splice(index, 1);
+				if (!$scope.$parent.trips[$scope.currentTripIndex].items.find(findPurchaser)) {
+					index = findWithAttr($scope.$parent.trips[$scope.currentTripIndex].purchasers, user.name);
+					$scope.$parent.trips[$scope.currentTripIndex].purchasers.splice(index, 1);
 				}
 			}
 		}
@@ -285,20 +349,21 @@ angular.module('indexApp').controller('mytripCtrl', ['$scope', 'socket', functio
 	}
 
 	$scope.calculate = function() {
-		if ($scope.$parent.profile.trips)
-			socket.emit('calculate', $scope.$parent.profile.trips[$scope.currentTripIndex]);
+		if ($scope.$parent.trips)
+			socket.emit('calculate', $scope.$parent.trips[$scope.currentTripIndex]);
 	}
 
 	socket.on('result', function(data) {
 		$scope.result = data;
 		$scope.showResult = true;
+		$scope.$apply();
 	});
 
 	socket.on('saveSuccess', function(room) {
 		console.log("ROOM: ", room);
-		if ($scope.$parent.profile.trips[$scope.currentTripIndex].room == "") {
-			$scope.$parent.profile.trips[$scope.currentTripIndex].room = room;
-			socket.emit('room', room);
+		if ($scope.$parent.trips[$scope.currentTripIndex] && $scope.$parent.trips[$scope.currentTripIndex].room == "") {
+			$scope.$parent.trips[$scope.currentTripIndex].room = room;
+			socket.emit('joinroom', room, $scope.$parent.profile.username);
 		}
 	});
 
@@ -307,15 +372,19 @@ angular.module('indexApp').controller('mytripCtrl', ['$scope', 'socket', functio
 	});
 
 	var tripTimeout;
-	$scope.$watch('profile.trips[currentTripIndex]',
+	$scope.$watch('trips[currentTripIndex]',
 		function (newValue, oldValue) {
-			if (newValue !== oldValue) {
-				if (tripTimeout) clearTimeout(tripTimeout);
-				tripTimeout = setTimeout(function () {
-					$scope.saveTrip();
-					console.log('saved');
-				}, 750);
-			}
+			console.log('tripTimeout: ', tripTimeout)
+			if (tripTimeout) clearTimeout(tripTimeout);
+			tripTimeout = setTimeout(function () {
+				$scope.saveTrip();
+				console.log('saved');
+			}, inputInterval);
 		}, true
 	);
+
+	socket.on('update', function(message) {
+		console.log('update: ', message);
+		$scope.loadTrip();
+	});
 }]);

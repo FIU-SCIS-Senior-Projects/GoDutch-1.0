@@ -6,7 +6,13 @@ angular.module('indexApp').controller('mainCtrl', ['$scope','$http','socket','st
 	then(
 		function(msg){
 			console.log(msg);
-			$scope.profile = msg;
+			$scope.profile = msg.profile;
+			var triplist = msg.trips;
+			$scope.trips.length = 0;
+			for (var i = 0; i < triplist.length; i++) {
+				$scope.trips.push(triplist[i]);
+				socket.emit('joinroom', triplist[i].room, $scope.profile.username);
+			}
 			$scope.isLoggedIn = true;
 		},function(error){
 			console.log(error);
@@ -15,4 +21,5 @@ angular.module('indexApp').controller('mainCtrl', ['$scope','$http','socket','st
 	);
 
 	$scope.profile;
+	$scope.trips = [];
 }]);

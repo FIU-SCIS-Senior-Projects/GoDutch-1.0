@@ -34,31 +34,23 @@ module.exports = function (app) {
 
 	app.route('/signin')
 		.post(function (req, res, next) {
-			if (req.user) {
-				res.json({ message: 'already logged in' });
-			}
 			passport.authenticate('local', function (err, user, info) {
 				if (err) { return next(err) }
 				if (!user) { return res.json(401, { error: 'Unsuccessful Login' }) }
-				var trips = [];
-
-
 				userModel.findById(user._id)
 					.populate('triplist') 
 					.exec(function (err, user) {
 						if (err) return handleError(err);
-						trips = user.triplist;
-
+						console.log(user.triplist);
 						var profile = {
 							username: user.username,
 							email: user.email,
 							id: user._id,
-							trips: trips
 						};
+						var trips = user.triplist;
 
 						var token = jwt.sign(profile, config.jwtSecret, { expiresIn: config.expire });
-						res.json({ token: token, profile: profile });
-						console.log("profile: ", profile);
+						res.json({ token: token, profile: profile, trips: trips });
 					});
 
 			})(req, res, next);

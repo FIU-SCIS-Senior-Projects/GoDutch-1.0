@@ -22,8 +22,13 @@ angular.module('indexApp').controller('navbarCtrl', ['$scope','$http','socket','
 				if(res.data.token){
 					$scope.$parent.isLoggedIn = true;
 					storage.put('token', res.data.token);
-					console.log(res.data.token);
 					$scope.$parent.profile = res.data.profile;
+					var triplist = res.data.trips;
+					$scope.$parent.trips.length = 0;
+					for (var i = 0; i < triplist.length; i++) {
+						$scope.$parent.trips.push(triplist[i]);
+						socket.emit('joinroom', triplist[i].room, $scope.$parent.profile.username);
+					}
 				}
 			},function(res){//failure
 				console.log(res.data.error);
@@ -31,7 +36,6 @@ angular.module('indexApp').controller('navbarCtrl', ['$scope','$http','socket','
 		)
 	}
 	$scope.signout = function(){
-		console.log('button pressed');
 		$http.post('/signout', '', config).
 		then(
 			function(res){

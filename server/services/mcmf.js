@@ -156,6 +156,7 @@ exports.runMCMF = function (trip) {
         var pur = new Map();
         var con = new Map();
         var itm = new Map();
+        var result = [];
 
         var i;
         for (i = 0; i < consumers.length; i++) {
@@ -165,11 +166,13 @@ exports.runMCMF = function (trip) {
             con.set(i+2, 0);
         }
 
+        result.push("Payments:");
         for (i = 0; i < items.length; i++) {
             var t = items[i];
             for (j = 0; j < t.purchasers.length; j++) {
                 var cur = t.purchasers[j].name;
                 var amount = t.payments[j];
+                result.push(cur + " spent " + amount.toFixed(2) + " dollars on " + t.name);
                 var p = p2nMap.get(cur);
                 if (!pur.has(p)) 
                     pur.set(p, 0);
@@ -209,13 +212,13 @@ exports.runMCMF = function (trip) {
         }
                 
         console.log(maxFlow());
-        var result = "";
+        result.push("Transactions:")
         for (var i = 2; i < adj.length; i++) {
             // console.log(adj[i].length);
             for (var j = 0; j < adj[i].length; j++) {
                 var e = adj[i][j];
                 if (e.f && i == e.u && e.v != 1) {
-                    result += (n2pMap.get(e.v) + " needs to pay " + n2pMap.get(e.u) + ": " + e.f.toFixed(2) + " dollars.\n");
+                    result.push((n2pMap.get(e.v) + " needs to pay " + n2pMap.get(e.u) + ": " + e.f.toFixed(2) + " dollars."));
                 }
             }
         }

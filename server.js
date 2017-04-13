@@ -28,9 +28,9 @@ app.use(express.static(__dirname + '/dist/public'));
 
 var server = http.createServer(app);
 var io = require('socket.io')(server);
+var userModel = mongoose.model('user');
 
 io.sockets.on('connection', function(socket) {
-//	console.log(socket.decoded_token.email);
 	require('./server/routes/tripRoute')(socket, io);
 
 	socket.on('auth', function(data){
@@ -40,7 +40,18 @@ io.sockets.on('connection', function(socket) {
 			}
 			else{
 				socket.decoded_token = decoded;
-				socket.emit('success', decoded);
+				userModel.findById(decoded.id)
+					.populate('triplist') 
+					.exec(function (err, user) {
+						if (err) return handleError(err);
+						var profile = {
+							username: decoded.username,
+							email: decoded.email,
+							id: decoded.id,
+						};
+						var trips = user.triplist;
+						socket.emit('success', { profile: profile, trips: trips} );
+					});
 			}
 		});
 	});
@@ -49,23 +60,19 @@ io.sockets.on('connection', function(socket) {
 	});
 
 	socket.on('isLogged', function(data){
-		console.log(data);
 		io.emit('logged', {logged: true});
 	})
 
 	socket.on('username', function() {
-		console.log("server: ", socket.decoded_token);
 		io.emit('usernameSuccess', socket.decoded_token);
 	})
 	
-    socket.on('room', function(room) {
+    socket.on('joinroom', function(room, username) {
 		if (io.sockets.adapter.sids[socket.id][room]) {
-			console.log(room, 'in');
-			io.in(room).emit('message', {data: 'you are already in'});
+			io.in(room).emit('message', {data: username + ' has already been in the room'});
 		} else {
         	socket.join(room);
-			console.log(room, 'out');
-			io.in(room).emit('message', {data: 'join room'});
+			io.in(room).emit('message', {data: username + ' joined the room'});
 		}
     });
 });

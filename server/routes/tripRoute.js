@@ -2,23 +2,24 @@ var tripController = require('../controllers/tripController')
 var mongoose = require('mongoose');
 var userModel = mongoose.model('user');
 
-module.exports = function (socket, io) {
+module.exports = function (socket, io, clients, index) {
 
 	socket.on('saveTrip', function (data) {
 		tripController.saveTrip(data).then(
 			function(room) {
-				io.sockets.emit('saveSuccess', room);
+				socket.emit('saveSuccess', {data: room});
+				io.in(room).emit('update', 'changes were made to room');
 			},
 			function(error) {
-				io.sockets.emit('saveFailure', error);
+				socket.emit('saveFailure', {data: error});
 			}
 		);
 	});
 
-	socket.on('createTrip', function (data) {
-		tripController.createTrip(data).then(
+	socket.on('createTrip', function (trip) {
+		tripController.createTrip(trip).then(
 			function(room) {
-				io.sockets.emit('saveSuccess', room);
+				socket.emit('saveSuccess', room);
 				console.log("here: ", room);
 				userModel.findByIdAndUpdate(socket.decoded_token.id, {
 					$push: {
@@ -29,12 +30,46 @@ module.exports = function (socket, io) {
 					}
 				}, {new: true}, function(err, user){
 					if (err) console.log(err.message);
-					else 
+					else {
+						socket.emit('joinTripSuccess', room);
 						console.log('successfully created trip');
+					}
 				});
 			},
 			function(error) {
-				io.sockets.emit('saveFailure', error);
+				socket.emit('joinTripFailure', error);
+			}
+		);
+	});
+
+	socket.on('joinTrip', function(object) {
+		var userid = object.userid, username = object.username, tripid = object.tripid;
+		console.log('userid: ', userid, 'tripid: ', tripid);
+		tripController.appendConsumer(userid, username, tripid)
+		.then(
+			function() {
+				tripController.joinTrip(userid, tripid).then(
+					function(room) {
+						socket.emit('joinTripSuccess', room);
+					},
+					function(error) {
+						socket.emit('joinTripFailure', error);
+					}
+				);
+			},
+			function(error) {
+				socket.emit('joinTripFailure', error);
+			}
+		);
+	});
+
+	socket.on('loadTrip', function(userid) {
+		tripController.loadTrip(userid).then(
+			function(triplist) {
+				socket.emit('loadTripSuccess', triplist);
+			},
+			function(error) {
+				socket.emit('loadTripFailure', error);
 			}
 		);
 	});
@@ -45,6 +80,6 @@ module.exports = function (socket, io) {
 
 	socket.on('calculate', function (data) {
 		var result = tripController.calculate(data);
-		io.sockets.emit('result', result);
+		socket.emit('result', result);
 	});
 };

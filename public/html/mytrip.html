@@ -1,11 +1,22 @@
 <div class="row">
 	<div class="tripList col-2">
 		<h1>Trip List</h1>
-		<div ng-repeat="trip in $parent.profile.trips" class="tripListElement" ng-click="viewTrip($index)">
+		<div ng-repeat="trip in $parent.trips" class="tripListElement" ng-click="viewTrip($index)">
 			<img src="trip.png" class="avatar col-12">
 			<p>{{trip.name}}</p>
 		</div>
-		<span title="add trip" ng-click="addTrip()"><i class="material-icons" style="font-size:48px;">add_circle_outline</i></span>
+		<div class="row">
+			<input type="text" placeholder="New trip name" ng-model="newTrip.name" class="col-8 form-control loginform">
+			<span title="add trip" ng-click="addTrip()"><i class="material-icons" style="font-size:48px;">add_circle_outline</i></span>
+		</div>
+		<div class="row">
+			<input type="text" placeholder="Trip ID" ng-model="tripToJoin.id" class="col-8 form-control loginform">
+			<span title="join trip" ng-click="joinTrip()"><i class="material-icons" style="font-size:48px;">group_add</i></span>
+		</div>
+		<div class="row">
+			<input type="email" placeholder="Email" ng-model="userToInvite.email" class="col-8 form-control loginform">
+			<span title="invite user" ng-click="invite()"><i class="material-icons" style="font-size:48px;">person_add</i></span>
+		</div>
 	</div>
 	<div class="col-7">
 		<div class="card">
@@ -57,13 +68,13 @@
 					<div class="row detail-row">
 						<label for="detail-name" class="col-3 detail-label">Item</label>
 						<div class="col-9">
-							<input type="text" class="form-control loginform" id="detail-name" placeholder="New Item" ng-model="detail.currentItem.name">
+							<input type="text" class="form-control loginform" id="detail-name" placeholder="New Item" ng-model="detail.currentItem.name" ng-change="nameChanged(detail.currentItem.name)">
 						</div>
 					</div>
 					<div class="row detail-row">
 						<label for="detail-amount" class="col-5 detail-label">You paid</label>
 						<div class="col-7">
-							<input type="text" class="form-control loginform" id="detail-amount" placeholder="$0.00" ng-model="detail.moneySpent" ng-change="inputChanged(detail.moneySpent)">
+							<input type="text" class="form-control loginform" id="detail-amount" placeholder="$0.00" ng-model="detail.moneySpent" ng-change="amountChanged(detail.moneySpent)">
 						</div>
 					</div>
 					<div class="row detail-row">
@@ -77,9 +88,9 @@
 		</div>
 		<div class="detail-button-container" ng-show="currentTripIndex>=0">
 			<div class="row">
-				<div class="col-6 text-center">
+				<!--<div class="col-6 text-center">
 					<button class="btn" ng-click="deleteTrip()">Quit Trip</button>
-				</div>
+				</div>-->
 				<div class="col-6 text-center">
 					<button class="btn" ng-click="calculate()">Calculate</button>
 				</div>
@@ -89,8 +100,8 @@
 			<div class="card-header">
 				<h1>Transactions</h1>
 			</div>
-			<div class="card-block justify-content-center">
-				{{result}}
+			<div class="card-block justify-content-center" ng-repeat="line in result">
+				{{line}}
 			</div>
 		</div>
 	</div>
