@@ -17,8 +17,17 @@ angular.module('indexApp').controller('navbarCtrl', ['$scope','$http','socket','
 		$http.post('/signin', $scope.newLogin, config).
 		then (
 			function(res){//success
-				socket.connect(res.data.token);
-				socket.emit('invite', 'Lonely@farmersOnly.com');
+				socket.emit('invite', {email: 'jbelt021@fiu.edu',
+					id: 123
+				});
+				socket.on('successEmail', function(data){
+					console.log('EMAIL SUCCRESS');
+					console.log(data);
+				})
+				socket.on('emailError', function(err){
+					console.log(err);
+					console.log('ERROR SENDING EMAIL');
+				});
 				console.log(res.data.token);
 				console.log(res);
 				if(res.data.token){
