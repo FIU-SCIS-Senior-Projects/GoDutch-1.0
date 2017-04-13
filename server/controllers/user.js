@@ -65,11 +65,9 @@ exports.joinTrip = function(req,res){
 
 exports.signup = function (req, res, next) {
 	if (req.user) { //If the user is already signed in
-	   	console.log('c');
 	   	res.send('success');						
 	} else {		
 		var User = new userModel(req.body);
-		console.log(User);
 		User.provider = 'local';
 		User.save(function (err) {
 			if (err) { //If the creation of the new user didn't work
@@ -82,8 +80,7 @@ exports.signup = function (req, res, next) {
 						var profile = {
 							username : User.username,
 							email : User.email,
-							id: User._id,
-							trips: []
+							id: User._id
 						}
 				
 						var token = jwt.sign(profile, config.jwtSecret, {expiresIn: config.expire});

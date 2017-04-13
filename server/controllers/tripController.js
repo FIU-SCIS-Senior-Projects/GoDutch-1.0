@@ -1,5 +1,6 @@
 var mongoose = require('mongoose');
 var tripModel = mongoose.model('tripModel');
+var userModel = mongoose.model('user');
 var path = require("path");
 var mcmf = require("../services/mcmf");
 
@@ -52,8 +53,8 @@ exports.saveTrip = function(data) {
 	return promise;
 }
 
-exports.createTrip = function(data) {
-    var Trip = new tripModel(data);
+exports.createTrip = function(trip) {
+    var Trip = new tripModel(trip);
 	var promise = new Promise((resolve, reject) => {
 		Trip.save(function (err) {
 			if (err) {
@@ -71,6 +72,53 @@ exports.createTrip = function(data) {
 				});
 			}
 		});
+	});
+	return promise;
+}
+
+exports.appendConsumer = function(userid, username, tripid) {
+	var promise = new Promise((resolve, reject) => {
+		tripModel.findByIdAndUpdate(tripid, {
+			$push: {
+				consumers: {
+					$each: [{_id: userid, name: username}]
+				}
+			}
+		}, {new: true}, function(err, trip){
+			console.log('new trip: ', trip);
+			if (err) reject(err);
+			else resolve();
+		});
+	});
+	return promise;	
+}
+
+exports.joinTrip = function(userid, tripid) {
+	var promise = new Promise((resolve, reject) => {
+		userModel.findByIdAndUpdate(userid, {
+			$push: {
+				triplist: {
+					$each: [tripid],
+					$position: 0
+				}
+			}
+		}, {new: true}, function(err, user){
+			console.log(user);
+			if (err) reject(err);
+			else resolve(tripid);
+		});
+	});
+	return promise;	
+}
+
+exports.loadTrip = function(userid) {
+	var promise = new Promise((resolve, reject) => {
+		userModel.findById(userid)
+			.populate('triplist') 
+			.exec(function (err, user) {
+				if (err) reject(err);
+				else resolve(user.triplist);
+			});
 	});
 	return promise;
 }
