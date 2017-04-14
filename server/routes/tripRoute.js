@@ -1,7 +1,9 @@
 var tripController = require('../controllers/tripController')
 var mongoose = require('mongoose');
+var jwt = require('jsonwebtoken');
 var userModel = mongoose.model('user');
-var email = require('../config/emailConfig'); 
+var emailConfig = require('../config/emailConfig');
+var config = require('../config/config');
 var nodemailer = require('nodemailer');
 var crypto = require('crypto'),
 	algorithm = 'aes-256-ctr';
@@ -9,15 +11,19 @@ var crypto = require('crypto'),
 module.exports = function (socket, io, clients, index) {
 
 	socket.on('cipher', function(link){
-		request = link;
-		options = email();
-	
-		var decipher = crypto.createDecipher(algorithm,options.secret);
-		var dec = decipher.update(request, 'base64', 'utf8');
-		dec += decipher.final('utf8');
-		email = dec.split(' ')[0]
-		trip_id = dec.split(' ')[1]
-
+		var request = decodeURI(link);
+		var options = emailConfig;
+		var decipher = crypto.createDecipher(algorithm, options.secret );
+		var parts = request.split('_');
+		console.log(parts);
+		var decEmail = decipher.update(parts[0], 'base64', 'utf8');
+		decEmail += decipher.final('utf8');
+		var email = decEmail;
+		decipher = crypto.createDecipher(algorithm, options.secret);
+		var decId = decipher.update(parts[1], 'base64', 'utf8');
+		decId += decipher.final('utf8');
+		var trip_id = decId;
+		console.log(trip_id);
 		var query = userModel.findOne({email:email});
 		query.populate('triplist')
 		.exec(function (err, user) {
@@ -37,7 +43,8 @@ module.exports = function (socket, io, clients, index) {
 	});
 
 	socket.on('invite', function(data){
-		var options = email();
+		var options = emailConfig;;
+		console.log(options);
 		var transporter = nodemailer.createTransport({
 			service: options.service,
 			host: "smtp.gmail.com",
@@ -56,10 +63,16 @@ module.exports = function (socket, io, clients, index) {
 		};
 		query.exec(function (err, user){
 			if(user){
-				var cipher = crypto.createCipher(algorithm, options.secret);
-				var link = cipher.update(data.email + ' ' + data.id.toString(),'utf8','base64');
-				link += cipher.final('base64');
-				mailOptions.text = 'http://192.168.56.100/#' + link.toString("utf-8");
+				console.log('data trying to cipher:' + data.id.toString('utf-8'));
+				var cipher = crypto.createCipher(algorithm,options.secret);
+				var link1 = cipher.update(data.email,'utf8','base64');
+				link1 += cipher.final('base64');
+				cipher = crypto.createCipher(algorithm,options.secret);
+				var link2 = cipher.update(data.id.toString('utf-8'),'utf8','base64');
+				link2 += cipher.final('base64');
+				link = encodeURI(link1 + "_" + link2);
+				console.log('generated link:' + link);
+				mailOptions.text = 'http://localhost:8080/#' + link.toString("utf-8");
 				console.log('transporter going here');
 				transporter.sendMail(mailOptions, function(error,info){
 					console.log('FINALLY HERE');
@@ -86,11 +99,19 @@ module.exports = function (socket, io, clients, index) {
 					if(err){
 						socket.emit('Error', err);
 					}
-					else{
-						var hash = crypto.createHmac('sha512', User.salt);
-						var link = hash.update(data.id.toString())
-						mailOptions.text = link;
-						transporter.sendMail(mailOptions, function(error,info){
+					else
+					{
+					console.log('data trying to cipher:' + data.id.toString('utf-8'));
+					var cipher = crypto.createCipher(algorithm,options.secret);
+					var link1 = cipher.update(data.email,'utf8','base64');
+					link1 += cipher.final('base64');
+					cipher = crypto.createCipher(algorithm, options.secret);
+					var link2 = cipher.update(data.id.toString('utf-8'),'utf8','base64');
+					link2 += cipher.final('base64');
+					link = encodeURI(link1 + "_" + link2);
+					console.log('generated link:' + link);					
+					mailOptions.text = 'http://localhost:8080/#' + link.toString("utf-8");				
+					transporter.sendMail(mailOptions, function(error,info){
 							if(error){
 								socket.emit('emailError', err);
 							}else{

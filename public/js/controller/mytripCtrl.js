@@ -61,7 +61,7 @@ angular.module('indexApp').controller('mytripCtrl', ['$scope', 'socket', functio
 			console.log("You need to be in a trip");
 		else {
 			var email = $scope.userToInvite.email;
-			var tripid = $scope.$parent.trips[$scope.currentTripIndex].room;
+			var tripid = $scope.$parent.trips[$scope.currentTripIndex].room;;
 			socket.emit('invite', 
 					{email: email,
 					id: tripid
@@ -376,6 +376,7 @@ angular.module('indexApp').controller('mytripCtrl', ['$scope', 'socket', functio
 			$scope.$parent.trips[$scope.currentTripIndex].room = room;
 			socket.emit('joinroom', room, $scope.$parent.profile.username);
 		}
+		$scope.loadTrip();
 	});
 
 	socket.on('saveFailure', function(error) {

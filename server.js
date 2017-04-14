@@ -50,6 +50,7 @@ io.sockets.on('connection', function(socket) {
 							id: decoded.id,
 						};
 						var trips = user.triplist;
+						console.log('auth requested');
 						socket.emit('success', { profile: profile, trips: trips} );
 					});
 			}

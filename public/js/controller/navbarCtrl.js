@@ -6,19 +6,18 @@ angular.module('indexApp').controller('navbarCtrl', ['$location','$scope','$http
 	$scope.newLogin = {}
 	var keywords = ['home', 'mytrip', 'contact', 'about'];
 	if($location.url()){
+		console.log("URL HAS A PARAMETER" + $location.url());
 		var param = $location.url().substring(1, $location.url().length);
-		if (keywords.indexOf(param) < -1){
+		console.log("is url in keywords " + keywords.indexOf(param));	
+		if (keywords.indexOf(param) == -1){
+			console.log("URI" + param);
 			socket.emit('cipher', param);
 			socket.on('decipher', function(data){
+				console.log("PROFILE:" + data.profile);
 				$scope.$parent.isLoggedIn = true;	
 				storage.put('token', data.token);	
 				$scope.$parent.profile = data.profile;
-				var triplist = res.data.trips;
-				$scope.$parent.trips.length = 0;
-				for (var i = 0; i < triplist.length; i++) {
-					$scope.$parent.trips.push(triplist[i]);
-					socket.emit('joinroom', triplist[i].room, $scope.$parent.profile.username);
-				}
+				var triplist = data.trips;
 			socket.emit('joinTrip', {userid: $scope.$parent.profile.id, username: $scope.$parent.profile.username, tripid: $scope.$parent.profile.tripid});
 				
 			});

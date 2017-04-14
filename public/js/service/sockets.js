@@ -4,7 +4,6 @@ app.factory('socket', function ($q) {
 	var socket = io.connect();
 	return {
 		on: function (eventName, callback) {
-		console.log('socket in front: ', socket);
 			socket.on(eventName, callback);
 		},
 		emit: function (eventName, data, callback) {
