@@ -1,7 +1,7 @@
 var emailConfig = {
 	service: 'gmail',
-	user: 'jbelt021@fiu.edu',
-	pass: 'Nuixy502',
+	user: 'example@fiu.edu',
+	pass: 'password',
 	secret: 'itsasecret'
 }
 
