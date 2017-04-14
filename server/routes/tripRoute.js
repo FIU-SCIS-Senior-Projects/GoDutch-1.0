@@ -63,27 +63,31 @@ module.exports = function (socket, io, clients, index) {
 		};
 		query.exec(function (err, user){
 			if(user){
-				console.log('data trying to cipher:' + data.id.toString('utf-8'));
-				var cipher = crypto.createCipher(algorithm,options.secret);
-				var link1 = cipher.update(data.email,'utf8','base64');
-				link1 += cipher.final('base64');
-				cipher = crypto.createCipher(algorithm,options.secret);
-				var link2 = cipher.update(data.id.toString('utf-8'),'utf8','base64');
-				link2 += cipher.final('base64');
-				link = encodeURI(link1 + "_" + link2);
-				console.log('generated link:' + link);
-				mailOptions.text = 'http://localhost:8080/#' + link.toString("utf-8");
-				console.log('transporter going here');
-				transporter.sendMail(mailOptions, function(error,info){
-					console.log('FINALLY HERE');
-					if(error){
-						console.log('HERE');
-						socket.emit('emailError', error);
-					}else{
-						console.log('HERE 2');
-						socket.emit('successEmail', info.response);
-					}
-				});
+				if (user.triplist.indexOf(data.id) == -1) {
+					console.log('data trying to cipher:' + data.id.toString('utf-8'));
+					var cipher = crypto.createCipher(algorithm,options.secret);
+					var link1 = cipher.update(data.email,'utf8','base64');
+					link1 += cipher.final('base64');
+					cipher = crypto.createCipher(algorithm,options.secret);
+					var link2 = cipher.update(data.id.toString('utf-8'),'utf8','base64');
+					link2 += cipher.final('base64');
+					link = encodeURI(link1 + "_" + link2);
+					console.log('generated link:' + link);
+					mailOptions.text = 'http://' + config.host + '/#' + link.toString("utf-8");
+					console.log('transporter going here');
+					transporter.sendMail(mailOptions, function(error,info){
+						console.log('FINALLY HERE');
+						if(error){
+							console.log('HERE');
+							socket.emit('emailError', error);
+						}else{
+							console.log('HERE 2');
+							socket.emit('successEmail', info.response);
+						}
+					});
+				} else {
+					console.log('Error: ' + user.username + ' is already in trip ' + data.id);
+				}
 			}
 			else{
 				console.log('HERE 3');
@@ -110,7 +114,7 @@ module.exports = function (socket, io, clients, index) {
 					link2 += cipher.final('base64');
 					link = encodeURI(link1 + "_" + link2);
 					console.log('generated link:' + link);					
-					mailOptions.text = 'http://localhost:8080/#' + link.toString("utf-8");				
+					mailOptions.text = 'http://' + config.host + '/#' + link.toString("utf-8");				
 					transporter.sendMail(mailOptions, function(error,info){
 							if(error){
 								socket.emit('emailError', err);
@@ -128,7 +132,7 @@ module.exports = function (socket, io, clients, index) {
 		tripController.saveTrip(data).then(
 			function(room) {
 				socket.emit('saveSuccess', {data: room});
-				io.in(room).emit('update', 'changes were made to room');
+				io.in(room).emit('update', 'changes were made to room: ' + room);
 			},
 			function(error) {
 				socket.emit('saveFailure', {data: error});

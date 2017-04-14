@@ -21,6 +21,7 @@ angular.module('indexApp').controller('mytripCtrl', ['$scope', 'socket', functio
 		didConsume: true
 	};
 	$scope.currentTripIndex = -1;
+	$scope.currentItemIndex = -1;
 	$scope.showDetail = false;
 	var p2iMap = new Map(),
 		i2pMap = new Map(),
@@ -73,12 +74,20 @@ angular.module('indexApp').controller('mytripCtrl', ['$scope', 'socket', functio
 				socket.on('emailError', function(err){
 					console.log(err);
 					console.log('ERROR SENDING EMAIL');
-				});		
+				});
 		}
 	}
 
+	socket.on('successEmail', function(data){
+		console.log('EMAIL SUCCRESS');
+		console.log(data);
+	});
+	socket.on('emailError', function(err){
+		console.log(err);
+		console.log('ERROR SENDING EMAIL');
+	});	
+
 	socket.on('joinTripSuccess', function(room) {
-		console.log(room, 'here');
 		socket.emit('joinroom', room, $scope.$parent.profile.username);
 		$scope.currentTripIndex = 0;
 		$scope.loadTrip();
@@ -96,7 +105,7 @@ angular.module('indexApp').controller('mytripCtrl', ['$scope', 'socket', functio
 		$scope.$parent.trips.length = 0;
 		for (var i = 0; i < triplist.length; i++)
 			$scope.$parent.trips.push(triplist[i]);
-		console.log('loadTripSuccess: ', triplist);
+		$scope.detail.currentItem = $scope.$parent.trips[$scope.currentTripIndex].items[$scope.currentItemIndex];
 		$scope.$apply();
 		$scope.viewTrip($scope.currentTripIndex);
 	});
@@ -273,6 +282,7 @@ angular.module('indexApp').controller('mytripCtrl', ['$scope', 'socket', functio
 		for (i = 0; list && i < list.length; i++)
 			if (list[i].name === $scope.$parent.profile.username)
 				$scope.detail.didConsume = true;
+		$scope.currentItemIndex = index;
 		$scope.detail.currentItem = $scope.$parent.trips[$scope.currentTripIndex].items[index];
 		$scope.showDetail = true;
 	}
@@ -296,8 +306,7 @@ angular.module('indexApp').controller('mytripCtrl', ['$scope', 'socket', functio
 
 	var nameTimeout;
 	$scope.nameChanged = function(name){
-		clearTimeout(nameTimeout);
-		console.log('timeout: ', nameTimeout);
+		if (nameTimeout) clearTimeout(nameTimeout);
 		nameTimeout = setTimeout(function () {
 			$scope.detail.currentItem.name = name;
 			console.log('change');
@@ -341,6 +350,7 @@ angular.module('indexApp').controller('mytripCtrl', ['$scope', 'socket', functio
 				}
 			}
 		}
+		$scope.$apply();
 		$scope.viewTrip($scope.currentTripIndex);
 	}
 
@@ -371,7 +381,6 @@ angular.module('indexApp').controller('mytripCtrl', ['$scope', 'socket', functio
 	});
 
 	socket.on('saveSuccess', function(room) {
-		console.log("ROOM: ", room);
 		if ($scope.$parent.trips[$scope.currentTripIndex] && $scope.$parent.trips[$scope.currentTripIndex].room == "") {
 			$scope.$parent.trips[$scope.currentTripIndex].room = room;
 			socket.emit('joinroom', room, $scope.$parent.profile.username);
@@ -384,9 +393,11 @@ angular.module('indexApp').controller('mytripCtrl', ['$scope', 'socket', functio
 	});
 
 	var tripTimeout;
-	$scope.$watch('trips[currentTripIndex]',
+	$scope.$watch(
+		function(){ 
+			return $scope.$parent.trips; 
+		},
 		function (newValue, oldValue) {
-			console.log('tripTimeout: ', tripTimeout)
 			if (tripTimeout) clearTimeout(tripTimeout);
 			tripTimeout = setTimeout(function () {
 				$scope.saveTrip();
