@@ -44,14 +44,17 @@ io.sockets.on('connection', function(socket) {
 					.populate('triplist') 
 					.exec(function (err, user) {
 						if (err) return handleError(err);
+						if (user) {
 						var profile = {
 							username: decoded.username,
 							email: decoded.email,
 							id: decoded.id,
 						};
+						console.log('from auth route' + user)
 						var trips = user.triplist;
 						console.log('auth requested');
 						socket.emit('success', { profile: profile, trips: trips} );
+						}
 					});
 			}
 		});

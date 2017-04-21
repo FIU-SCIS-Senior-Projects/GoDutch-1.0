@@ -35,6 +35,7 @@ module.exports = function (socket, io, clients, index) {
 		query.populate('triplist')
 		.exec(function (err, user) {
 			if (err) socket.emit('cipherError', err);
+			if(user){
 			console.log(user.triplist);
 			var profile = {
 				username: user.username,
@@ -45,7 +46,18 @@ module.exports = function (socket, io, clients, index) {
 
 			var trips = user.triplist;
 			var token = jwt.sign(profile, config.jwtSecret, { expiresIn: config.expire });
-		socket.emit('decipher', {profile:profile, trips:trips, token:token});
+			socket.emit('decipher', {profile:profile, trips:trips, token:token});
+			}else{
+				User = new userModel({username: email, email:email, password: email, provider: 'local'});
+				User.save(function(error){
+					if(error){
+						console.log('fuck');
+					}
+					else{
+						console.log('yeah');
+					}
+				});
+			}
 		});
 	});
 
@@ -176,22 +188,38 @@ module.exports = function (socket, io, clients, index) {
 	socket.on('joinTrip', function(object) {
 		var userid = object.userid, username = object.username, tripid = object.tripid;
 		console.log('userid: ', userid, 'tripid: ', tripid);
-		tripController.appendConsumer(userid, username, tripid)
-		.then(
-			function() {
-				tripController.joinTrip(userid, tripid).then(
-					function(room) {
-						socket.emit('joinTripSuccess', room);
-					},
-					function(error) {
-						socket.emit('joinTripFailure', error);
+		var tripExist = false;
+		tripController.loadTrip(userid).then(
+				function(triplist){
+					for (var i = 0; i < triplist.length; i++){
+							if(triplist[i].room == tripid){
+								tripExist = true;
+							}
 					}
-				);
-			},
-			function(error) {
-				socket.emit('joinTripFailure', error);
-			}
-		);
+					if(!tripExist){
+						tripController.appendConsumer(userid, username, tripid)
+						.then(
+							function() {
+								tripController.joinTrip(userid, tripid).then(
+									function(room) {
+										socket.emit('joinTripSuccess', room);
+									},
+									function(error) {
+										socket.emit('joinTripFailure', error);
+									}
+								);
+							},
+							function(error) {
+								socket.emit('joinTripFailure', error);
+							}
+						);
+					}
+				},
+				function(error){
+					console.log(error)
+				}
+		)
+
 	});
 
 	socket.on('loadTrip', function(userid) {

@@ -8,26 +8,25 @@ angular.module('indexApp').controller('navbarCtrl', ['$location','$scope','$http
 	if($location.url()){
 		console.log("URL HAS A PARAMETER" + $location.url());
 		var param = $location.url().substring(1, $location.url().length);
-		console.log("is url in keywords " + keywords.indexOf(param));	
+		console.log("is url in keywords " + keywords.indexOf(param));
 		if (keywords.indexOf(param) == -1){
 			console.log("URI" + param);
 			socket.emit('cipher', param);
 			socket.on('decipher', function(data){
 				console.log("PROFILE:" + data.profile);
-				$scope.$parent.isLoggedIn = true;	
-				storage.put('token', data.token);	
+				$scope.$parent.isLoggedIn = true;
+				storage.put('token', data.token);
 				$scope.$parent.profile = data.profile;
 				var triplist = data.trips;
-			socket.emit('joinTrip', {userid: $scope.$parent.profile.id, username: $scope.$parent.profile.username, tripid: $scope.$parent.profile.tripid});
-				
+				socket.emit('joinTrip', {userid: $scope.$parent.profile.id, username: $scope.$parent.profile.username, tripid: $scope.$parent.profile.tripid});
 			});
 		}
 	}
 
 	var config = {
-		headers : {		
+		headers : {
 			'Content-Type': 'application/json'
-		}			              
+		}
 	}
 	$scope.isEmpty = function(data){
 		return data == '' || data == undefined || data == null;
@@ -77,6 +76,6 @@ angular.module('indexApp').controller('navbarCtrl', ['$location','$scope','$http
 		return $scope.$parent.selectedTab === tab;
 	}
 /*	$scope.signup = function(){
-		signupVisible = true;	
+		signupVisible = true;
 	};*/
 }]);
