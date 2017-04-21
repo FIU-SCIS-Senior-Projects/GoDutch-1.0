@@ -17,9 +17,20 @@
 					<div ng-controller="contactCtrl" ng-show="isLoggedIn && show()" class="contact col-12" ng-include src="template.url"></div>
 					<div ng-controller="signupCtrl" ng-show="!isLoggedIn" class="signup col-12" ng-include src="template.url"></div> 
 			   		<div ng-controller="mytripCtrl" ng-show="isLoggedIn && show()" class="mytrip col-12" ng-include src="template.url"></div>
-		    		</div>
+		    			<div ng-controller="homeCtrl" ng-show="isLoggedIn && show()" class="homer col-12" ng-include src="template.url"></div>
+				</div>
 	    		</div>
-			<footer id = "bottom" class="footer">footer</footer> 
+			<footer id = "bottom" class="footer site-footer">
+				 <ul class="inline-list">
+       					 <li><a href="" class="icon ion-speakerphone">Blog</a></li>
+       					 <li><a href="" class="icon ion-social-github">Github</a></li>
+				         <li><a href="" class="icon ion-social-twitch">Twitch</a></li>
+				         <li><a href="" class="icon ion-social-linkedin">LinkedIn</a></li>
+      				  	 <li><a href="" class="icon ion-social-facebook">Facebook</a></li>
+       					 <li><a href="" class="icon ion-social-twitter">Twitter</a></li>
+       					 <li><a href="" class="icon ion-locked">Privacy</a></li>
+   				 </ul>
+			</footer> 
 		</div>
 	</body>
 </html>
