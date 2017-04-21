@@ -20,6 +20,7 @@ module.exports = function(app){
 	
 //	app.set('view engine', 'ejs');
 	app.set('views', __dirname + '/../../dist/public');
+	app.use(express.static(__dirname + '/../routes/resources'));
 	console.log(__dirname)
 	app.use(passport.initialize());
 	app.use(passport.session());

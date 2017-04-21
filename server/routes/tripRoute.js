@@ -1,5 +1,6 @@
 var tripController = require('../controllers/tripController')
 var mongoose = require('mongoose');
+var fs = require('fs');
 var jwt = require('jsonwebtoken');
 var userModel = mongoose.model('user');
 var emailConfig = require('../config/emailConfig');
@@ -9,21 +10,27 @@ var crypto = require('crypto'),
 	algorithm = 'aes-256-ctr';
 
 module.exports = function (socket, io, clients, index) {
-
+	var CI = function(cipher, text){
+		var link = cipher.update(text, 'utf8', 'base64');
+		link += cipher.final('base64');
+		return link;
+	};
+	var DI = function(decipher, encrypt){
+		var text = decipher.update(encrypt, 'base64', 'utf8');
+		text += decipher.final('utf8');
+		return text;
+	};
 	socket.on('cipher', function(link){
 		var request = decodeURI(link);
 		var options = emailConfig;
 		var decipher = crypto.createDecipher(algorithm, options.secret );
 		var parts = request.split('_');
-		console.log(parts);
-		var decEmail = decipher.update(parts[0], 'base64', 'utf8');
-		decEmail += decipher.final('utf8');
-		var email = decEmail;
+		var email = DI(decipher, parts[0]);
+
 		decipher = crypto.createDecipher(algorithm, options.secret);
-		var decId = decipher.update(parts[1], 'base64', 'utf8');
-		decId += decipher.final('utf8');
-		var trip_id = decId;
-		console.log(trip_id);
+
+		var trip_id = DI(decipher, parts[1]);
+
 		var query = userModel.findOne({email:email});
 		query.populate('triplist')
 		.exec(function (err, user) {
@@ -43,7 +50,7 @@ module.exports = function (socket, io, clients, index) {
 	});
 
 	socket.on('invite', function(data){
-		var options = emailConfig;;
+		var options = emailConfig;
 		console.log(options);
 		var transporter = nodemailer.createTransport({
 			service: options.service,
@@ -61,36 +68,36 @@ module.exports = function (socket, io, clients, index) {
 			to: data.email,
 			subject: 'Welcome to GoDutch!'
 		};
+
 		query.exec(function (err, user){
 			if(user){
 				if (user.triplist.indexOf(data.id) == -1) {
 					console.log('data trying to cipher:' + data.id.toString('utf-8'));
 					var cipher = crypto.createCipher(algorithm,options.secret);
-					var link1 = cipher.update(data.email,'utf8','base64');
-					link1 += cipher.final('base64');
+					var link1 = CI(cipher, data.email);
 					cipher = crypto.createCipher(algorithm,options.secret);
-					var link2 = cipher.update(data.id.toString('utf-8'),'utf8','base64');
-					link2 += cipher.final('base64');
-					link = encodeURI(link1 + "_" + link2);
-					console.log('generated link:' + link);
-					mailOptions.text = 'http://' + config.host + '/#' + link.toString("utf-8");
-					console.log('transporter going here');
-					transporter.sendMail(mailOptions, function(error,info){
-						console.log('FINALLY HERE');
-						if(error){
-							console.log('HERE');
-							socket.emit('emailError', error);
-						}else{
-							console.log('HERE 2');
-							socket.emit('successEmail', info.response);
-						}
+					var link2 = CI(cipher, data.id.toString('utf-8'));
+					var link = encodeURI(link1 + "_" + link2).toString('utf-8');;
+					var emailLink = 'http://' + config.host + '/#' + link;
+
+					fs.readFile(__dirname + '/resources/email.html', 'utf8', function(err, html){
+						var res = html.replace('$USER1', 'Jonathan Beltran');
+						res = res.replace('$LINK', emailLink);
+						mailOptions.html = res;
+						transporter.sendMail(mailOptions, function(error,info){
+							if(error){
+								socket.emit('emailError', error);
+							}else{
+								socket.emit('successEmail', info.response);
+							}
+						});
+
 					});
 				} else {
 					console.log('Error: ' + user.username + ' is already in trip ' + data.id);
 				}
 			}
 			else{
-				console.log('HERE 3');
 				var newUser = {
 					username: data.email,
 					email: data.email,
@@ -99,35 +106,35 @@ module.exports = function (socket, io, clients, index) {
 				}
 				var User = new userModel(newUser);
 				User.save(function(err){
-					console.log(User, err);	
+					console.log(User, err);
 					if(err){
 						socket.emit('Error', err);
-					}
-					else
-					{
-					console.log('data trying to cipher:' + data.id.toString('utf-8'));
-					var cipher = crypto.createCipher(algorithm,options.secret);
-					var link1 = cipher.update(data.email,'utf8','base64');
-					link1 += cipher.final('base64');
-					cipher = crypto.createCipher(algorithm, options.secret);
-					var link2 = cipher.update(data.id.toString('utf-8'),'utf8','base64');
-					link2 += cipher.final('base64');
-					link = encodeURI(link1 + "_" + link2);
-					console.log('generated link:' + link);					
-					mailOptions.text = 'http://' + config.host + '/#' + link.toString("utf-8");				
-					transporter.sendMail(mailOptions, function(error,info){
-							if(error){
-								socket.emit('emailError', err);
-							}else{
-								socket.emit('successEmail', info.response);
-							}
+					}else{
+						console.log('data trying to cipher:' + data.id.toString('utf-8'));
+						var cipher = crypto.createCipher(algorithm,options.secret);
+						var link1 = CI(cipher, data.email);
+						cipher = crypto.createCipher(algorithm, options.secret);
+						var link2 = CI(cipher, data.id.toString('utf-8'));
+						var link = encodeURI(link1 + "_" + link2).toString('utf-8');
+						emailLink = 'http://' + config.host + '/#' + link;
+						fs.readFile(__dirname + '/resources/email.html', 'utf8', function(err, html){
+							var res = html.replace('$USER1', 'Jonathan Beltran');
+							res = res.replace('$LINK', emailLink);
+							mailOptions.html = res;
+							transporter.sendMail(mailOptions, function(error,info){
+								if(error){
+									socket.emit('emailError', error);
+								}else{
+									socket.emit('successEmail', info.response);
+								}
+							});
 						});
 					}
 				});
 			}
-		});
 		transporter.close();
 	});
+});
 	socket.on('saveTrip', function (data) {
 		tripController.saveTrip(data).then(
 			function(room) {

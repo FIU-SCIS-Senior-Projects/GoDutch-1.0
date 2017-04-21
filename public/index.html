@@ -10,13 +10,16 @@
 		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.7/angular-resource.min.js"></script>
 	</head>
 	<body ng-app="indexApp" ng-controller="mainCtrl">
-		<nav ng-controller="navbarCtrl" class="navbar" ng-include src="template.url"></nav>
-		<div class="container-fluid">
-			<div class="row">
-				<div ng-controller="signupCtrl" ng-show="!isLoggedIn" class="signup col-12" ng-include src="template.url"></div> 
-			    <div ng-controller="mytripCtrl" ng-show="isLoggedIn && show()" class="mytrip col-12" ng-include src="template.url"></div>
-		    </div>
-	    </div>
-		<footer class="footer">footer</footer> 
+		<div id="wrapper">
+			<nav id = "top" ng-controller="navbarCtrl" class="navbar navbar-fixed-top nav" ng-include src="template.url"></nav>
+			<div id = "middle" class="container-fluid">
+				<div class="row">
+					<div ng-controller="contactCtrl" ng-show="isLoggedIn && show()" class="contact col-12" ng-include src="template.url"></div>
+					<div ng-controller="signupCtrl" ng-show="!isLoggedIn" class="signup col-12" ng-include src="template.url"></div> 
+			   		<div ng-controller="mytripCtrl" ng-show="isLoggedIn && show()" class="mytrip col-12" ng-include src="template.url"></div>
+		    		</div>
+	    		</div>
+			<footer id = "bottom" class="footer">footer</footer> 
+		</div>
 	</body>
 </html>
