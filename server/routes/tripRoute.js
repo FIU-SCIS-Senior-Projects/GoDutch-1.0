@@ -95,6 +95,7 @@ module.exports = function (socket, io, clients, index) {
 					fs.readFile(__dirname + '/resources/email.html', 'utf8', function(err, html){
 						var res = html.replace('$USER1', 'Jonathan Beltran');
 						res = res.replace('$LINK', emailLink);
+						res = res.replace('$LINK', emailLink);
 						mailOptions.html = res;
 						transporter.sendMail(mailOptions, function(error,info){
 							if(error){
