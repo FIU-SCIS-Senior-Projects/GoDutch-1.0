@@ -1,0 +1,28 @@
+<div>
+    <ul>
+        <li><a href="#home" ng-class="{'active':varify('home')}" ng-click="set('home')">Home</a></li>
+        <li><a href="#mytrip" ng-class="{'active':varify('mytrip')}" ng-click="set('mytrip')">My Trip</a></li>
+        <li><a href="#contact" ng-class="{'active':varify('contact')}" ng-click="set('contact')">Contact Us</a></li>
+        <li><a href="#about" ng-class="{'active':varify('about')}" ng-click="set('about')">About</a></li>
+		<button class="identity" ng-click="signout()" ng-show="isLoggedIn">Sign Out</button>
+        <li class="identity" ng-show="!isLoggedIn">
+            <form class="navbar-form">
+                <div class="identity item">
+                    <label for="inputEmail3">Email/Username</label>
+                    <div>
+                        <input type="email" name="username" id="inputEmail" placeholder="Email/Username" ng-model="newLogin.username">
+                    </div>
+                </div>
+                <div class="identity item">
+                    <label for="inputPassword3">Password</label>
+                    <div>
+                        <input type="password" name="password" id="inputPassword" placeholder="Password" ng-model="newLogin.password">
+                    </div>
+                </div>
+                <div class="item">
+                    <button class="btn" ng-click="signin()" ng-disabled="isEmpty(newLogin.username) || isEmpty(newLogin.password)">Sign in</button>
+                </div>
+            </form>
+        </li>
+    </ul>
+</div>

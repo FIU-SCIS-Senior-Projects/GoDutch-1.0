@@ -1,0 +1,48 @@
+.navbar {
+    background-color: @navbar !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    font-size: @font-large;
+    font-weight: bold;
+
+	.active {
+	    background-color: @main-orange;
+	}
+
+	li a:hover:not(.active) {
+	    background-color: @light-green;
+	}
+
+	.identity {
+		font-weight: normal !important;
+		font-size: @font-mid;
+		float: right !important;
+		color: white !important;
+
+		label {
+			margin: 0 !important;
+		}
+
+		input {
+			border: 1px solid !important;
+			border-radius: 0.25rem !important;
+		}
+
+		.item {
+			margin: 0 !important;
+			margin-right: 10px !important;
+			float: left !important;
+		}
+
+		.btn {
+			top: 25px;
+			position: relative;
+			padding: 4px;
+			font-size: 14px;
+		}
+	}
+}
+
+.nav{
+	position: absolute;
+}
