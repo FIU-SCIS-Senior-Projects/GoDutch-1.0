@@ -1,4 +1,4 @@
-node_modules
-dist
+Code/node_modules
+Code/dist
 **/*.swp
-server/config/config.js
+Code/server/config/config.js

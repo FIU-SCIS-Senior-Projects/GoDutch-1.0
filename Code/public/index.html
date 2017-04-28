@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+		<link rel="stylesheet" href="css/bootstrap.css">
+		<link rel="stylesheet" href="css/style.css">
+		<script src="js/angular.min.js"></script>
+		<script src="js/app.js"></script>
+		<script src="/socket.io/socket.io.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.7/angular-resource.min.js"></script>
+	</head>
+	<body ng-app="indexApp" ng-controller="mainCtrl">
+		<div id="wrapper">
+			<nav id = "top" ng-controller="navbarCtrl" class="navbar navbar-fixed-top nav" ng-include src="template.url"></nav>
+			<div id = "middle" class="container-fluid">
+				<div class="row">
+					<div ng-controller="contactCtrl" ng-show="isLoggedIn && show()" class="contact col-12" ng-include src="template.url"></div>
+					<div ng-controller="signupCtrl" ng-show="!isLoggedIn" class="signup col-12" ng-include src="template.url"></div> 
+			   		<div ng-controller="mytripCtrl" ng-show="isLoggedIn && show()" class="mytrip col-12" ng-include src="template.url"></div>
+		    			<div ng-controller="homeCtrl" ng-show="isLoggedIn && show()" class="home col-12" ng-include src="template.url"></div>
+				</div>
+	    		</div>
+			<footer id = "bottom" class="footer site-footer">
+				 <ul class="inline-list">
+       					 <li><a href="" class="icon ion-speakerphone">Blog</a></li>
+       					 <li><a href="" class="icon ion-social-github">Github</a></li>
+				         <li><a href="" class="icon ion-social-twitch">Twitch</a></li>
+				         <li><a href="" class="icon ion-social-linkedin">LinkedIn</a></li>
+      				  	 <li><a href="" class="icon ion-social-facebook">Facebook</a></li>
+       					 <li><a href="" class="icon ion-social-twitter">Twitter</a></li>
+       					 <li><a href="" class="icon ion-locked">Privacy</a></li>
+   				 </ul>
+			</footer> 
+		</div>
+	</body>
+</html>
